@@ -1,17 +1,72 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from users.models import User, Role, Module, RolePermission, user
+from users.models import User, Role, Module, RolePermission, Action
 from django.core.validators import RegexValidator
 import re
 from django.core.validators import validate_email
 
 
 User = get_user_model()
+
+class ActionBasicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Action
+        fields = ['id', 'name', 'code']
+        read_only_fields = fields
+
+class ModuleBasicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Module
+        fields = ['id', 'name', 'code']
+        read_only_fields = fields
+
+class RolePermissionSerializer(serializers.ModelSerializer):
+    module = ModuleBasicSerializer(read_only=True)
+    action = ActionBasicSerializer(read_only=True)
+
+    class Meta:
+        model = RolePermission
+        fields = ['id', 'module', 'action']
+        read_only_fields = fields
+
+    def to_representation(self, instance):
+        """
+        Output JSON ko manually restructured  for better clarity in response.
+        """
+        # Original id ko fetch 
+        data = super().to_representation(instance)
+        
+        # make a new custom 'module' dictionary with required fields from both module and action
+        custom_module_data = {
+            "id": instance.module.id,
+            "module_name": instance.module.name,
+            "modu_code": instance.module.code,
+            "action_name": instance.action.name,
+            "action_code": instance.action.code
+        }
+        print("Custom module data being returned:", custom_module_data)  # Debug print statement
+        # Final structured response return
+        return {
+            "id": data['id'],
+            "module": custom_module_data
+        }
+
+class RoleBasicSerializer(serializers.ModelSerializer):
+    permissions = RolePermissionSerializer(source='role_permissions', many=True, read_only=True)
+    class Meta:
+        model = Role
+        fields = ['id', 'name', 'code', 'permissions']
+        read_only_fields = fields
+
+
 class UserSerializer(serializers.ModelSerializer):
     role_name = serializers.CharField(source='role.name', read_only=True)
     role_code = serializers.CharField(source='role.code', read_only=True)
 
+
+    # Nested user data (read-only)
+    role = RoleBasicSerializer(read_only=True)
     class Meta:
         model = User
         fields = ('id', 'email', 'username', 'first_name', 'last_name', 'profile_pic',

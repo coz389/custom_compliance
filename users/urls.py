@@ -1,8 +1,8 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenBlacklistView
-
 from users.views import (
     RegisterView, UserProfileView, ChangePasswordView, 
+    LogoutView, LogoutAllView,
     UserListCreateView, UserDetailView, 
     RoleCreateView,RoleListView, RoleDetailView, 
     ModuleListCreateView, ModuleDetailView, 
@@ -10,13 +10,16 @@ from users.views import (
 )
 
 
+
 urlpatterns = [
     # Auth
     path('auth/register', RegisterView.as_view(), name='auth_register'),
     path('auth/login', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
-    path('auth/logout', TokenBlacklistView.as_view(), name='token_blacklist'),
+    path('auth/logout', LogoutView.as_view(), name='auth_logout'),
+    path('auth/logout-all', LogoutAllView.as_view(), name='logout_all'),
     path('auth/me', UserProfileView.as_view(), name='auth_me'),
+
     path('auth/change-password', ChangePasswordView.as_view(), name='auth_change_password'),
 
     # Users (admin)
@@ -27,7 +30,7 @@ urlpatterns = [
     path('roles', RoleListView.as_view(), name='role_list_filter'),
     path('roles/add', RoleCreateView.as_view(), name='role_create'),
     path('roles/<int:pk>', RoleDetailView.as_view(), name='role_detail'),
-    # path('roles/delete/<int:pk>', RoleDetailView.as_view(), name='role_delete'),
+    path('roles/delete/<int:pk>', RoleDetailView.as_view(), name='role_delete'),
 
     # Modules
     path('modules', ModuleListCreateView.as_view(), name='module_list'),
