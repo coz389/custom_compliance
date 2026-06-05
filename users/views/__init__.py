@@ -1,5 +1,5 @@
 from .auth_views import RegisterView,UserProfileView, ChangePasswordView, LogoutView, LogoutAllView
-from .user_views import UserListView,UserDetailView,UserListRequestSerializer
+from .user_views import UserListView,UserDetailView,UserListRequestSerializer,UserActiveInactiveView
 from .role_views import RoleListView, RoleCreateView, RoleDetailView
 from .module_views import ModuleListCreateView, ModuleDetailView
 from .permission_views import RolePermissionListCreateView, RolePermissionDetailView
@@ -16,6 +16,7 @@ __all__ = [
     'UserListView',
     'UserDetailView',
     'UserListRequestSerializer',
+    'UserActiveInactiveView',
     # Role views
     'RoleListView',
     'RoleCreateView',

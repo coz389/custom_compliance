@@ -147,3 +147,26 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
             "message": "User soft-deleted successfully",
             "data": serializer.data
         }, status=status.HTTP_200_OK)
+    
+
+
+class UserActiveInactiveView(APIView):
+    """
+    Activate or deactivate a user (admin only)
+    """
+    permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+    module_code = 'user_management'
+    action_code = 'update'
+
+    def get(self, request, pk):
+        try:
+            user = User.objects.get(pk=pk, deleted_at__isnull=True)
+        except User.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Toggle active status
+        user.is_active = not user.is_active
+        user.save()
+
+        status_str = "activated" if user.is_active else "deactivated"
+        return Response({"detail": f"User has been {status_str}."}, status=status.HTTP_200_OK)
