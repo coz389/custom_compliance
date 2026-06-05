@@ -73,7 +73,7 @@ class RoleListView(generics.GenericAPIView):
             if sort_order.lower() == 'desc':
                 queryset = queryset.order_by(f'-{sort_column}')
             else:
-                queryset = queryset.order_by(f'-{sort_column}')
+                queryset = queryset.order_by(f'{sort_column}')
 
 
         # --- GLOBAL SEARCH LOGIC ---
@@ -99,13 +99,13 @@ class RoleListView(generics.GenericAPIView):
         # We need to trick DRF paginator to read page from our clean_data instead of query_params
         # Or we can manually paginate
         try:
-            page = paginator.paginate_queryset(queryset, request, view=self)
             # Standard paginator uses query_params, so we override the request's query_params temporarily
             # But a cleaner way is to set the page number manually if possible.
             # For simplicity, let's inject into request.query_params for the paginator to find it
             request.query_params._mutable = True
             request.query_params['page'] = page_num
             request.query_params['page_size'] = page_size
+            request.query_params._mutable = False
             
             page = paginator.paginate_queryset(queryset, request, view=self)
             

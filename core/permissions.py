@@ -21,11 +21,11 @@ class HasModulePermission(BasePermission):
         action_code = getattr(view, 'action_code', None)
 
         # Debugging print (can be removed in production)
-        print(f"--- Permission Check ---")
-        print(f"User: {request.user.email}")
-        print(f"Role: {request.user.role.code if request.user.role else 'None'}")
-        print(f"Module: {module_code}")
-        print(f"Action: {action_code}")
+        # print(f"--- Permission Check ---")
+        # print(f"User: {request.user.email}")
+        # print(f"Role: {request.user.role.code if request.user.role else 'None'}")
+        # print(f"Module: {module_code}")
+        # print(f"Action: {action_code}")
 
         if not module_code or not action_code:
             print("Decision: DENIED (Module or Action code missing)")

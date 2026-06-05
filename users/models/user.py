@@ -4,7 +4,7 @@ from core.models import BaseModel
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
-        print("Fields:", extra_fields)
+        # print("Fields:", extra_fields)
         if not email:
             raise ValueError('Email is required')
         email = self.normalize_email(email)

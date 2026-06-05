@@ -45,7 +45,7 @@ class RolePermissionSerializer(serializers.ModelSerializer):
             "action_name": instance.action.name,
             "action_code": instance.action.code
         }
-        print("Custom module data being returned:", custom_module_data)  # Debug print statement
+        #print("Custom module data being returned:", custom_module_data)  # Debug print statement
         # Final structured response return
         return {
             "id": data['id'],
@@ -209,3 +209,14 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+class UserListRequestSerializer(serializers.Serializer):
+    """ Only for documentation and validation of list endpoint filters and pagination parameters in Swagger. Not used for actual filtering logic in the view."""
+    search = serializers.CharField(required=False, allow_blank=True, help_text="Name, code ya description mein search karein")
+    name = serializers.CharField(required=False, allow_blank=True)
+    email = serializers.EmailField(required=False, allow_null=True)
+    phone_number = serializers.CharField(required=False, allow_null=True)
+    created_at = serializers.DateField(required=False, allow_null=True)
+    page = serializers.IntegerField(required=False, default=1)
+    page_size = serializers.IntegerField(required=False, default=10)
+    sort_column = serializers.CharField(required=False, default='created_at')
+    sort_order = serializers.ChoiceField(choices=['asc', 'desc'], required=False, default='asc')

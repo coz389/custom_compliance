@@ -3,7 +3,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from users.views import (
     RegisterView, UserProfileView, ChangePasswordView, 
     LogoutView, LogoutAllView,
-    UserListCreateView, UserDetailView, 
+    UserListView, UserDetailView, 
     RoleCreateView,RoleListView, RoleDetailView, 
     ModuleListCreateView, ModuleDetailView, 
     RolePermissionListCreateView, RolePermissionDetailView
@@ -23,7 +23,7 @@ urlpatterns = [
     path('auth/change-password', ChangePasswordView.as_view(), name='auth_change_password'),
 
     # Users (admin)
-    path('users', UserListCreateView.as_view(), name='user_list_create'),
+    path('users', UserListView.as_view(), name='user_list'),
     path('users/<int:pk>/', UserDetailView.as_view(), name='user_detail'),
 
     # Roles
