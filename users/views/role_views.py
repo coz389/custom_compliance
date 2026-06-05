@@ -25,6 +25,8 @@ class RoleFilter(django_filters.FilterSet):
         model = Role
         fields = ['name', 'created_by', 'status', 'created_at','created_by']
 
+
+
 class RoleListView(generics.GenericAPIView):
     """
     List all roles with filtering using POST method
@@ -44,6 +46,7 @@ class RoleListView(generics.GenericAPIView):
     @extend_schema(
         request=RoleListRequestSerializer, # Request body schema for filtering and pagination to show in Swagger
         responses={200: RoleSerializer(many=True)},
+        tags=['Roles Management'], # Grouping in Swagger UI
         description="List all active roles with optional filtering, sorting, and pagination. Use POST method to send filter criteria in the request body.", # Detailed description for Swagger UI
         summary="List Roles (with filtering)", # Swagger UI heading for this endpoint
         operation_id="v1_roles_list_post" # URL fragment for this operation in Swagger UI
@@ -118,6 +121,8 @@ class RoleListView(generics.GenericAPIView):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+
+@extend_schema(tags=['Roles Management']) 
 class RoleCreateView(generics.CreateAPIView):
     """
     Create a new role (admin only)
@@ -132,6 +137,7 @@ class RoleCreateView(generics.CreateAPIView):
         # Explicitly set action to 'add' for creation
         super().check_permissions(request)
 
+@extend_schema(tags=['Roles Management']) 
 class RoleDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     Retrieve, update or delete a specific role (admin only)

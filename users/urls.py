@@ -31,13 +31,13 @@ urlpatterns = [
     path('roles', RoleListView.as_view(), name='role_list_filter'),
     path('roles/add', RoleCreateView.as_view(), name='role_create'),
     path('roles/<int:pk>', RoleDetailView.as_view(), name='role_detail'),
-    path('roles/delete/<int:pk>', RoleDetailView.as_view(), name='role_delete'),
+    # path('roles/delete/<int:pk>', RoleDetailView.as_view(), name='role_delete'),
 
     # Modules
-    path('modules', ModuleListCreateView.as_view(), name='module_list'),
-    path('modules/<int:pk>/', ModuleDetailView.as_view(), name='module_detail'),
+    # path('modules', ModuleListCreateView.as_view(), name='module_list'),
+    # path('modules/<int:pk>/', ModuleDetailView.as_view(), name='module_detail'),
 
     # Role Permissions
-    path('role-permissions', RolePermissionListCreateView.as_view(), name='role_permission_list_create'),
-    path('role-permissions/<int:pk>/', RolePermissionDetailView.as_view(), name='role_permission_detail'),
+    # path('role-permissions', RolePermissionListCreateView.as_view(), name='role_permission_list_create'),
+    # path('role-permissions/<int:pk>/', RolePermissionDetailView.as_view(), name='role_permission_detail'),
 ]
