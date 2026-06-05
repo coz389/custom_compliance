@@ -38,7 +38,9 @@ class UserListView(APIView):
     @extend_schema(
         request=UserListRequestSerializer,
         responses={200: UserSerializer(many=True)},
-        summary="List Users (POST Filter)",
+        tags=['Users Management'], # Grouping in Swagger UI
+        description="List all users with optional filtering, sorting, and pagination. Use POST method to send filter criteria in the request body.", # Detailed description for Swagger UI
+        summary="List Users (With Filter)",
         operation_id="user_list_post"
     )
     def post(self, request):        
@@ -102,6 +104,7 @@ class UserListView(APIView):
 
         serializer = UserSerializer(queryset, many=True)
         return Response(serializer.data)
+@extend_schema(tags=['Users Management']) 
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     Retrieve, update or delete a specific user (admin only)
@@ -149,7 +152,7 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
         }, status=status.HTTP_200_OK)
     
 
-
+@extend_schema(tags=['Users Management']) 
 class UserActiveInactiveView(APIView):
     """
     Activate or deactivate a user (admin only)

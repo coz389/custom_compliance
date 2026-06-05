@@ -12,9 +12,11 @@ from users.serializers import (
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
+from drf_spectacular.utils import extend_schema
+
 
 User = get_user_model()
-
+@extend_schema(tags=['Auth Management']) 
 class RegisterView(generics.CreateAPIView):
     """
     User registration endpoint (public)
@@ -23,6 +25,7 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = RegisterSerializer
 
+@extend_schema(tags=['Auth Management']) 
 class UserProfileView(generics.RetrieveAPIView):
     """
     Get current user's profile
@@ -33,6 +36,7 @@ class UserProfileView(generics.RetrieveAPIView):
     def get_object(self):
         return self.request.user
 
+@extend_schema(tags=['Auth Management']) 
 class ChangePasswordView(APIView):
     """
     Change current user's password
@@ -50,6 +54,7 @@ class ChangePasswordView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
+@extend_schema(tags=['Auth Management']) 
 class LogoutView(APIView):
     """
     Logout a specific session by blacklisting the refresh token.
@@ -69,6 +74,7 @@ class LogoutView(APIView):
             return Response({"detail": "Invalid or expired refresh token."}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(tags=['Auth Management']) 
 class LogoutAllView(APIView):
     """
     Logout from all sessions by blacklisting all outstanding tokens for the user.
