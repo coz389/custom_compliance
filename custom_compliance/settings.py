@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     # Our apps
     'core',
     'users',
+    'master_data',
 ]
 
 MIDDLEWARE = [
