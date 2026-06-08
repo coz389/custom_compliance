@@ -1,27 +1,27 @@
 from django.core.management.base import BaseCommand
 from users.models import User, Role,Action, Module, RolePermission
+from django.utils import timezone
 
 
 
 class Command(BaseCommand):
     help = 'Seed initial data: roles, modules, actions, and role permissions'
-
     def handle(self, *args, **options):
         self.stdout.write('Seeding data...')
-
+        admin_user = User.objects.get(pk=1)
         # ---------- Actions ----------
         actions_data = [
-            {'name': 'ADD', 'code': 'add'},
-            {'name': 'VIEW', 'code': 'view'},
-            {'name': 'UPDATE', 'code': 'update'},
-            {'name': 'DELETE', 'code': 'delete'},
-            {'name': 'EXPORT', 'code': 'export'},
-            {'name': 'IMPORT', 'code': 'import'},
-            {'name': 'DOWNLOAD', 'code': 'download'},
-            {'name': 'CANCEL', 'code': 'cancel'},
-            {'name': 'COPY', 'code': 'copy'},
-            {'name': 'DRAFT', 'code': 'draft'},
-            {'name': 'REJECT', 'code': 'reject'},
+            {'name': 'ADD', 'code': 'add','created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'VIEW', 'code': 'view','created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'UPDATE', 'code': 'update','created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'DELETE', 'code': 'delete','created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'EXPORT', 'code': 'export','created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'IMPORT', 'code': 'import','created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'DOWNLOAD', 'code': 'download','created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'CANCEL', 'code': 'cancel','created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'COPY', 'code': 'copy','created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'DRAFT', 'code': 'draft','created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'REJECT', 'code': 'reject','created_by':admin_user,'created_at':timezone.now()},
         ]
         actions = {}
         for act in actions_data:
@@ -34,23 +34,23 @@ class Command(BaseCommand):
 
         # ---------- Modules ----------
         modules_data = [
-            {'name': 'Dashboard', 'code': 'dashboard', 'icon': 'file-text', 'order': 1},
-            {'name': 'Shipments', 'code': 'shipments', 'icon': 'folder', 'order': 2},
-            {'name': 'Customers', 'code': 'customers', 'icon': 'tags', 'order': 3},
-            {'name': 'Document Type', 'code': 'document_type', 'icon': 'comments', 'order': 4},
-            {'name': 'Equipment', 'code': 'equipment', 'icon': 'image', 'order': 5},
-            {'name': 'Equipment Types', 'code': 'equipment_types', 'icon': 'users', 'order': 6},
-            {'name': 'Email Templates', 'code': 'email_templates', 'icon': 'shield', 'order': 7},
-            {'name': 'Shipper Freight Forwarder Map', 'code': 'shipper_freight_forwarder_map', 'icon': 'cog', 'order': 8},
-            {'name': 'User Management', 'code': 'user_management', 'icon': 'file-text', 'order': 9},
-            {'name': 'User Roles', 'code': 'user_roles', 'icon': 'folder', 'order': 10},
-            {'name': 'Status', 'code': 'status', 'icon': 'tags', 'order': 11},
-            {'name': 'Regions', 'code': 'regions', 'icon': 'comments', 'order': 12},
-            {'name': 'Sub regions', 'code': 'sub_regions', 'icon': 'image', 'order': 13},
-            {'name': 'Countries', 'code': 'countries', 'icon': 'users', 'order': 14},
-            {'name': 'Carrier Types', 'code': 'carrier_types', 'icon': 'shield', 'order': 15},
-            {'name': 'Transport Modes', 'code': 'transport_modes', 'icon': 'users', 'order': 16},
-            {'name': 'User Activity Logs', 'code': 'user_activity_logs', 'icon': 'history', 'order': 17},
+            {'name': 'Dashboard', 'code': 'dashboard', 'icon': 'file-text', 'order': 1,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Shipments', 'code': 'shipments', 'icon': 'folder', 'order': 2,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Customers', 'code': 'customers', 'icon': 'tags', 'order': 3,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Document Type', 'code': 'document_type', 'icon': 'comments', 'order': 4,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Equipment', 'code': 'equipment', 'icon': 'image', 'order': 5,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Equipment Types', 'code': 'equipment_types', 'icon': 'users', 'order': 6,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Email Templates', 'code': 'email_templates', 'icon': 'shield', 'order': 7,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Shipper Freight Forwarder Map', 'code': 'shipper_freight_forwarder_map', 'icon': 'cog', 'order': 8,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'User Management', 'code': 'user_management', 'icon': 'file-text', 'order': 9,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'User Roles', 'code': 'user_roles', 'icon': 'folder', 'order': 10,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Status', 'code': 'status', 'icon': 'tags', 'order': 11,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Regions', 'code': 'regions', 'icon': 'comments', 'order': 12,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Sub regions', 'code': 'sub_regions', 'icon': 'image', 'order': 13,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Countries', 'code': 'countries', 'icon': 'users', 'order': 14,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Carrier Types', 'code': 'carrier_types', 'icon': 'shield', 'order': 15,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Transport Modes', 'code': 'transport_modes', 'icon': 'users', 'order': 16,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'User Activity Logs', 'code': 'user_activity_logs', 'icon': 'history', 'order': 17,'created_by':admin_user,'created_at':timezone.now()},
         ]
         modules = {}
         for mod in modules_data:
@@ -70,14 +70,14 @@ class Command(BaseCommand):
 
         # ---------- Roles ----------
         roles_data = [
-            {'name': 'Super Admin', 'code': 'super_admin','description': 'Platform owner / product operations'},
-            {'name': 'Port Admin', 'code': 'port_admin','description': 'Port authority customer administrator.'},
-            {'name': 'Port User', 'code': 'port_user','description': 'Port operational user handling day-to-day activities.'},
-            {'name': 'Shipper', 'code': 'shipper','description': 'Shipment owner who creates shipments before gate entry.'},
-            {'name': 'Freight Forwarder', 'code': 'freight_forwarder','description': 'Creates and manages shipments on behalf of shippers.'},
-            {'name': 'Consignee', 'code': 'consignee','description': 'The receiver of the goods.'},
-            {'name': 'Customs Officer', 'code': 'customs_officer','description': 'Performs inspection and records inspection results.'},
-            {'name': 'Customs Supervisor', 'code': 'customs_supervisor','description': 'Reviews inspections, handles escalations and approvals.'},
+            {'name': 'Super Admin', 'code': 'super_admin','description': 'Platform owner / product operations','created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Port Admin', 'code': 'port_admin','description': 'Port authority customer administrator.','created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Port User', 'code': 'port_user','description': 'Port operational user handling day-to-day activities.','created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Shipper', 'code': 'shipper','description': 'Shipment owner who creates shipments before gate entry.','created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Freight Forwarder', 'code': 'freight_forwarder','description': 'Creates and manages shipments on behalf of shippers.','created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Consignee', 'code': 'consignee','description': 'The receiver of the goods.','created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Customs Officer', 'code': 'customs_officer','description': 'Performs inspection and records inspection results.','created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Customs Supervisor', 'code': 'customs_supervisor','description': 'Reviews inspections, handles escalations and approvals.','created_by':admin_user,'created_at':timezone.now()},
         ]
         roles = {}
         for role in roles_data:
@@ -154,7 +154,9 @@ class Command(BaseCommand):
                     obj, created = RolePermission.objects.get_or_create(
                         role=role,
                         module=module,
-                        action=action
+                        action=action,
+                        created_by=admin_user,
+                        created_at=timezone.now()
                     )
                     if created:
                         self.stdout.write(f'  Perm: {role.name} | {module.name} | {action.name}')

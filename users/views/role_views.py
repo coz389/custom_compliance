@@ -137,7 +137,6 @@ class RoleCreateView(generics.CreateAPIView):
         # Explicitly set action to 'add' for creation
         super().check_permissions(request)
 
-@extend_schema(tags=['Roles Management']) 
 class RoleDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     Retrieve, update or delete a specific role (admin only)
