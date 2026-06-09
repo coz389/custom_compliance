@@ -1,19 +1,20 @@
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from users.models import Role,User
-from users.serializers import RoleSerializer,RoleListRequestSerializer
-# from users.serializers import RoleSerializer
 from core.permissions import HasModulePermission
 import django_filters
 from django.db.models import Q
 from django.contrib.auth import get_user_model
 
+from master_data.models import Status
+from master_data.serializers import StatusListRequestSerializer,StatusSerializer
+
+
 from drf_spectacular.utils import extend_schema # Swagger customization
 
 User = get_user_model()
 
-class RoleFilter(django_filters.FilterSet):
+class StatusFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(lookup_expr='icontains')
     # Date filter: match specific date
     created_at = django_filters.DateFilter(field_name='created_at', lookup_expr='date')
@@ -22,19 +23,19 @@ class RoleFilter(django_filters.FilterSet):
     created_at_max = django_filters.DateFilter(field_name='created_at', lookup_expr='date__lte')
     
     class Meta:
-        model = Role
+        model = Status
         fields = ['name', 'created_by', 'status', 'created_at','created_by']
 
 
 
-class RoleListView(generics.GenericAPIView):
+class StatusListView(generics.GenericAPIView):
     """
-    List all roles with filtering using POST method
+    List all status with filtering using POST method
     """
-    queryset = Role.objects.select_related('created_by', 'updated_by').filter(status=True)
-    serializer_class = RoleSerializer
+    queryset = Status.objects.select_related('created_by', 'updated_by').filter(status=True)
+    serializer_class = StatusSerializer
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
-    module_code = 'user_roles'
+    module_code = 'status'
 
     def get_action_code(self):
         return 'view'
@@ -44,12 +45,12 @@ class RoleListView(generics.GenericAPIView):
         super().check_permissions(request)
 
     @extend_schema(
-        request=RoleListRequestSerializer, # Request body schema for filtering and pagination to show in Swagger
-        responses={200: RoleSerializer(many=True)},
-        tags=['Roles Management'], # Grouping in Swagger UI
-        description="List all active roles with optional filtering, sorting, and pagination. Use POST method to send filter criteria in the request body.", # Detailed description for Swagger UI
-        summary="List Roles (with filtering)", # Swagger UI heading for this endpoint
-        operation_id="v1_roles_list_post" # URL fragment for this operation in Swagger UI
+        request=StatusListRequestSerializer, # Request body schema for filtering and pagination to show in Swagger
+        responses={200: StatusSerializer(many=True)},
+        tags=['Status Management'], # Grouping in Swagger UI
+        description="List all active status with optional filtering, sorting, and pagination. Use POST method to send filter criteria in the request body.", # Detailed description for Swagger UI
+        summary="List Status (with filtering)", # Swagger UI heading for this endpoint
+        operation_id="v1_status_list_post" # URL fragment for this operation in Swagger UI
     )
 
     def post(self, request, *args, **kwargs):
@@ -60,7 +61,7 @@ class RoleListView(generics.GenericAPIView):
                       for k, v in request.data.items()}
         
         # 1. Apply filters
-        filterset = RoleFilter(clean_data, queryset=queryset)
+        filterset = StatusFilter(clean_data, queryset=queryset)
         if filterset.is_valid():
             queryset = filterset.qs
         else:
@@ -71,7 +72,7 @@ class RoleListView(generics.GenericAPIView):
         sort_order = clean_data.get('sort_order', 'desc') # default to newest first
         
         # Validate sort_column exists in model
-        allowed_columns = [f.name for f in Role._meta.fields]
+        allowed_columns = [f.name for f in Status._meta.fields]
         if sort_column in allowed_columns:
             if sort_order.lower() == 'desc':
                 queryset = queryset.order_by(f'-{sort_column}')
@@ -84,8 +85,7 @@ class RoleListView(generics.GenericAPIView):
         if search:
             # Yeh name, code, ya description mein se kahin bhi match karega (OR condition)
             queryset = queryset.filter(
-                Q(name__icontains=search) | 
-                Q(code__icontains=search) | 
+                Q(name__icontains=search) |
                 Q(description__icontains=search)
             )
 
@@ -122,29 +122,29 @@ class RoleListView(generics.GenericAPIView):
         return Response(serializer.data)
 
 
-@extend_schema(tags=['Roles Management']) 
-class RoleCreateView(generics.CreateAPIView):
+@extend_schema(tags=['Status Management']) 
+class StatusCreateView(generics.CreateAPIView):
     """
-    Create a new role (admin only)
+    Create a new status (admin only)
     """
-    queryset = Role.objects.all()
-    serializer_class = RoleSerializer
+    queryset = Status.objects.all()
+    serializer_class = StatusSerializer
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
-    module_code = 'user_roles'
+    module_code = 'status'
     action_code = 'add'
 
     def check_permissions(self, request):
         # Explicitly set action to 'add' for creation
         super().check_permissions(request)
 
-class RoleDetailView(generics.RetrieveUpdateDestroyAPIView):
+class StatusDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
-    Retrieve, update or delete a specific role (admin only)
+    Retrieve, update or delete a specific status (admin only)
     """
-    queryset = Role.objects.all()
-    serializer_class = RoleSerializer
+    queryset = Status.objects.all()
+    serializer_class = StatusSerializer
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
-    module_code = 'user_roles'
+    module_code = 'status'
     action_code = 'view'  # default to view, will adjust in check_permissions
 
     def get_action_code(self):
@@ -172,14 +172,14 @@ class RoleDetailView(generics.RetrieveUpdateDestroyAPIView):
         
         # CRITICAL FIX: Base manager dynamically targeted bypassing soft-delete filtration block
         # explicit backend reload executing base manager
-        instance = Role.all_objects.get(pk=instance.pk)
+        instance = Status.all_objects.get(pk=instance.pk)
 
         # 5. Pipeline Serialization mapping out exact object state representation
         serializer = self.get_serializer(instance)
         
         return Response({
             "status": "success",
-            "message": "Role deleted successfully",
+            "message": "Status deleted successfully",
             "data": serializer.data
         }, status=status.HTTP_200_OK)
 
