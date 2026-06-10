@@ -1,3 +1,4 @@
-from django.shortcuts import render
+from master_data.views.city_views import CityCreateView, CityListView, CityDetailView
 
-# Create your views here.
+__all__ = ['CityCreateView', 'CityListView', 'CityDetailView']
+
