@@ -48,9 +48,7 @@ class StatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Status
         # fields = '__all__'
-        fields = ['id', 'name', 'description', 'status','created_by', 'updated_by', 'deleted_by']
-        read_only_fields = ['created_by', 'updated_by', 'deleted_by']
-
+        fields = ['id', 'name', 'description', 'status','created_by','created_at', 'updated_by', 'updated_at']
     def get_created_by_name(self, obj):
         if obj.created_by:
             return getattr(obj.created_by, 'name', obj.created_by.username)
@@ -61,7 +59,7 @@ class StatusSerializer(serializers.ModelSerializer):
         
 class StatusListRequestSerializer(serializers.Serializer):
     """ Only for documentation and validation of list endpoint filters and pagination parameters in Swagger. Not used for actual filtering logic in the view."""
-    search = serializers.CharField(required=False, allow_blank=True, help_text="Name, code ya description mein search karein")
+    search = serializers.CharField(required=False, allow_blank=True, help_text="Search only Name and Description")
     name = serializers.CharField(required=False, allow_blank=True)
     status = serializers.BooleanField(required=False, allow_null=True)
     created_at = serializers.DateField(required=False, allow_null=True)
