@@ -1,7 +1,6 @@
 from django.urls import path
 from master_data.views.city_views import CityCreateView, CityDetailView, CityListView
-from master_data.views.country_views import CountryDropdownView
-from master_data.views.state_views import StateDropdownView
+from master_data.views.dropdown_views import CountryDropdownView, StateDropdownView
 
 urlpatterns = [
     path('country/list', CountryDropdownView.as_view(), name='country-list'),

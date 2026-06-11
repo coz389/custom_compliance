@@ -23,7 +23,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('users.urls')),
-    path('api/v1/', include('master_data.urls')),
+    path('api/v1/master-data/', include('master_data.urls')),
     # Schema file download karne ke liye
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     # Interactive Swagger UI dekhne ke liye
