@@ -66,14 +66,14 @@ class RoleSerializer(serializers.ModelSerializer):
         raw_name = validated_data.get('name')
         clean_spaces = " ".join(raw_name.split())
         generated_code = clean_spaces.replace(' ', '_').lower()
-        # CRITICAL VALIDATION DETECTOR: 20 characters length boundary checkpoint
-        if len(generated_code) > 20:
+        # CRITICAL VALIDATION DETECTOR: 80 characters length boundary checkpoint
+        if len(generated_code) > 80:
             raise serializers.ValidationError({
                 "success": False,
                 "message": "The generated configuration identifier is too long.",
                 "data": {
                     "name": [
-                        f"The name provided generates a code '{generated_code}' ({len(generated_code)} characters) which exceeds the system maximum length threshold of 20 characters."
+                        f"The name provided generates a code '{generated_code}' ({len(generated_code)} characters) which exceeds the system maximum length threshold of 80 characters."
                     ]
                 }
             })
