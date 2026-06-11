@@ -41,7 +41,7 @@ class RolePermissionSerializer(serializers.ModelSerializer):
         custom_module_data = {
             "id": instance.module.id,
             "module_name": instance.module.name,
-            "modu_code": instance.module.code,
+            "module_code": instance.module.code,
             "action_name": instance.action.name,
             "action_code": instance.action.code
         }
