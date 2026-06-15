@@ -12,7 +12,7 @@ from master_data.serializers.dropdown_serializers import (
 
 @extend_schema(
     responses={200: CountryDropdownSerializer(many=True)},
-    tags=["Country Management"],
+    tags=["Dropdown lists"],
     description="Dropdown list of countries.",
     summary="Country Dropdown",
     operation_id="v1_country_list",
@@ -23,7 +23,7 @@ class CountryDropdownView(generics.ListAPIView):
     pagination_class = None
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
 
-    module_code = "country"
+    module_code = "countries"
     action_code = "view"
 
 
@@ -45,7 +45,7 @@ class CountryDropdownView(generics.ListAPIView):
         ),
     ],
     responses={200: StateDropdownSerializer(many=True)},
-    tags=["State Management"],
+    tags=["Dropdown lists"],
     description="Dropdown list of states filtered by country.",
     summary="State Dropdown",
     operation_id="v1_state_list",
@@ -55,7 +55,7 @@ class StateDropdownView(generics.ListAPIView):
     pagination_class = None
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
 
-    module_code = "country"
+    module_code = "countries"
     action_code = "view"
 
     def get_queryset(self):

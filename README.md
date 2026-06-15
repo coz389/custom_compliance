@@ -54,7 +54,7 @@ Activate the environment to start using the isolated Python interpreter.
 Install all necessary libraries and dependencies from the `requirement.txt` file.
 
 ```bash
-pip install -r requirement.txt
+pip install -r requirements.txt
 ```
 
 ### Step 4: Setup your Database
