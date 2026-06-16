@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.contrib.auth import get_user_model
 
 from master_data.models import Status
-from master_data.serializers import StatusListRequestSerializer,StatusSerializer
+from master_data.serializers import StatusListRequestSerializer,StatusSerializer,StatusUpdateSerializer
 
 
 from drf_spectacular.utils import extend_schema # Swagger customization
@@ -144,6 +144,7 @@ class StatusDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Status.objects.all()
     serializer_class = StatusSerializer
+    # serializer_class = StatusUpdateSerializer
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
     module_code = 'status'
     action_code = 'view'  # default to view, will adjust in check_permissions

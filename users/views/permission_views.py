@@ -1,7 +1,9 @@
 from rest_framework import generics, permissions
 from users.models import RolePermission
-from users.serializers import RolePermissionSerializer
+from users.serializers import RolePermissionSerializer,RolePermissionCreateSerializer
 from core.permissions import HasModulePermission
+import django_filters
+from django.db.models import Q
 
 class RolePermissionListCreateView(generics.ListCreateAPIView):
     """
@@ -23,6 +25,20 @@ class RolePermissionListCreateView(generics.ListCreateAPIView):
         self.action_code = self.get_action_code()
         super().check_permissions(request)
 
+# @extend_schema(tags=['Role Management']) 
+class RolePermissionCreateView(generics.CreateAPIView):
+    """
+    Create a new status (admin only)
+    """
+    queryset = RolePermission.objects.all()
+    serializer_class = RolePermissionCreateSerializer
+    permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+    module_code = 'user_roles'
+    action_code = 'add'
+
+    def check_permissions(self, request):
+        # Explicitly set action to 'add' for creation
+        super().check_permissions(request)
 
 class RolePermissionDetailView(generics.RetrieveUpdateDestroyAPIView):
     """

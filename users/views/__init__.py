@@ -2,7 +2,7 @@ from .auth_views import RegisterView,UserProfileView, ChangePasswordView, Logout
 from .user_views import UserListView,UserDetailView,UserListRequestSerializer,UserActiveInactiveView
 from .role_views import RoleListView, RoleCreateView, RoleDetailView
 from .module_views import ModuleListCreateView, ModuleDetailView
-from .permission_views import RolePermissionListCreateView, RolePermissionDetailView
+from .permission_views import RolePermissionListCreateView,RolePermissionCreateView, RolePermissionDetailView
 
 
 __all__ = [
@@ -26,5 +26,6 @@ __all__ = [
     'ModuleDetailView',
     # Permission views
     'RolePermissionListCreateView',
+    'RolePermissionCreateView',
     'RolePermissionDetailView',
 ]

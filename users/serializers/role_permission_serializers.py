@@ -13,8 +13,16 @@ class UserBasicSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'email', 'username']
         read_only_fields = fields
-        
+
+
+
+class RolePermissionCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RolePermission
+        # fields = '__all__'
+        fields = ['id', 'role','module','action']
 class RolePermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = RolePermission
-        fields = '__all__'
+        # fields = '__all__'
+        fields = ['id', 'role','module','action','created_by','created_at', 'updated_by', 'updated_at']
