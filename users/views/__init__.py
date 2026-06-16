@@ -2,7 +2,7 @@ from .auth_views import RegisterView,UserProfileView, ChangePasswordView, Logout
 from .user_views import UserListView,UserDetailView,UserListRequestSerializer,UserActiveInactiveView
 from .role_views import RoleListView, RoleCreateView, RoleDetailView
 from .module_views import ModuleListCreateView, ModuleDetailView
-from .permission_views import RolePermissionListCreateView,RolePermissionCreateView, RolePermissionDetailView
+from .permission_views import RolePermissionListCreateView,RolePermissionCreateView, RolePermissionDetailView,ModuleActionAssocDropdownView
 
 
 __all__ = [
@@ -28,4 +28,5 @@ __all__ = [
     'RolePermissionListCreateView',
     'RolePermissionCreateView',
     'RolePermissionDetailView',
+    'ModuleActionAssocDropdownView',
 ]

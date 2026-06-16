@@ -4,6 +4,10 @@ from users.serializers import RolePermissionSerializer,RolePermissionCreateSeria
 from core.permissions import HasModulePermission
 import django_filters
 from django.db.models import Q
+from drf_spectacular.utils import OpenApiParameter, extend_schema
+from users.serializers import ModuleActionDropdownSerializer
+from users.models import ModuleActionAssoc
+
 
 class RolePermissionListCreateView(generics.ListCreateAPIView):
     """
@@ -61,3 +65,20 @@ class RolePermissionDetailView(generics.RetrieveUpdateDestroyAPIView):
     def check_permissions(self, request):
         self.action_code = self.get_action_code()
         super().check_permissions(request)
+
+@extend_schema(
+    responses={200: ModuleActionDropdownSerializer(many=True)},
+    tags=["Dropdown lists"],
+    description="Dropdown list of Module Action.",
+    summary="Module Action Dropdown",
+    operation_id="v1_module_action_list",
+)
+class ModuleActionAssocDropdownView(generics.ListAPIView):
+    queryset = ModuleActionAssoc.objects.all()
+    serializer_class = ModuleActionDropdownSerializer
+    pagination_class = None
+    filter_backends = []  # Disable search, ordering, filters
+    permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+
+    module_code = "user_roles"
+    action_code = "view"
