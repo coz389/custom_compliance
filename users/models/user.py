@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin,AbstractUser
 from core.models import BaseModel
+from .role import Role
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -17,6 +18,14 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
+        try:
+            role_id = Role.objects.get(code="super_admin").pk
+            extra_fields.setdefault('role_id', role_id)  # pass the int PK
+        except Role.DoesNotExist:
+            raise ValueError(
+                "super_admin role does not exist. "
+                "Run seed data first."
+            )
 
         # Super admin role assign after role creation
         return self.create_user(email, password, **extra_fields)
