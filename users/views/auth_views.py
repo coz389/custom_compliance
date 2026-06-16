@@ -2,20 +2,52 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework import status
 from django.contrib.auth import get_user_model
 from users.serializers import (
     RegisterSerializer, 
     ChangePasswordSerializer, 
+    LoginSerializer,
     UserSerializer
 )
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from drf_spectacular.utils import extend_schema
 
 
 User = get_user_model()
+@extend_schema(tags=['Auth Management']) 
+class LoginView(TokenObtainPairView):
+    serializer_class = LoginSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except TokenError as e:
+            # Sirf actual auth failure yahan aana chahiye
+            return Response(
+                {'status': 401, 'message': 'Invalid credentials.', 'results': None},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return Response(
+                {'status': 500, 'message': f'Server error: {str(e)}', 'results': None},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        # Desired Response Format
+        return Response({
+            "status": 200,
+            "message": "Login successful.",
+            "results": serializer.validated_data
+        }, status=status.HTTP_200_OK)
 @extend_schema(tags=['Auth Management']) 
 class RegisterView(generics.CreateAPIView):
     """

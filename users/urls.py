@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenBlacklistView
 from users.views import (
-    RegisterView, UserProfileView, ChangePasswordView, 
+    LoginView,RegisterView, UserProfileView, ChangePasswordView, 
     LogoutView, LogoutAllView,
     UserListView, UserDetailView,UserActiveInactiveView, 
     RoleCreateView,RoleListView, RoleDetailView, 
@@ -14,7 +14,8 @@ from users.views import (
 urlpatterns = [
     # Auth
     path('auth/register', RegisterView.as_view(), name='auth_register'),
-    path('auth/login', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    # path('auth/login', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('auth/login', LoginView.as_view(), name='login'),
     path('auth/token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/logout', LogoutView.as_view(), name='auth_logout'),
     path('auth/logout-all', LogoutAllView.as_view(), name='logout_all'),
@@ -38,7 +39,7 @@ urlpatterns = [
     # path('modules/<int:pk>/', ModuleDetailView.as_view(), name='module_detail'),
 
     # Role Permissions
-    # path('role-permissions', RolePermissionListCreateView.as_view(), name='role_permission_list'),
+    path('role-permissions', RolePermissionListCreateView.as_view(), name='role_permission_list'),
     path('role-permissions/add', RolePermissionCreateView.as_view(), name='role_permission_create'),
     path('module-action-assoc', ModuleActionAssocDropdownView.as_view(), name='module_action_assoc_list'),
     path('role-permissions/<int:pk>/', RolePermissionDetailView.as_view(), name='role_permission_detail'),

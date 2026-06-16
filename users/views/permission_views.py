@@ -1,6 +1,6 @@
 from rest_framework import generics, permissions
 from users.models import RolePermission
-from users.serializers import RolePermissionSerializer,RolePermissionCreateSerializer
+from users.serializers import RolePermissionSerializer,RolePermissionCreateUpdateSerializer
 from core.permissions import HasModulePermission
 import django_filters
 from django.db.models import Q
@@ -35,7 +35,7 @@ class RolePermissionCreateView(generics.CreateAPIView):
     Create a new status (admin only)
     """
     queryset = RolePermission.objects.all()
-    serializer_class = RolePermissionCreateSerializer
+    serializer_class = RolePermissionCreateUpdateSerializer
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
     module_code = 'user_roles'
     action_code = 'add'
@@ -53,13 +53,19 @@ class RolePermissionDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
     module_code = 'user_roles'
 
+    def get_serializer_class(self):
+        if self.request.method in ['PUT', 'PATCH']:
+            return RolePermissionCreateUpdateSerializer 
+        # for others default serializer
+        return self.serializer_class
+    
     def get_action_code(self):
         if self.request.method == 'GET':
             return 'view'
         elif self.request.method in ['PUT', 'PATCH']:
             return 'update'
-        elif self.request.method == 'DELETE':
-            return 'delete'
+        # elif self.request.method == 'DELETE':
+        #     return 'delete'
         return None
 
     def check_permissions(self, request):

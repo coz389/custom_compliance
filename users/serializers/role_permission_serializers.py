@@ -30,11 +30,11 @@ class ModuleBasicSerializer(serializers.ModelSerializer):
 
 
 #Module Action Assoc Dropdown
-class RolePermissionCreateSerializer(serializers.ModelSerializer):
+class RolePermissionCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = RolePermission
         # fields = '__all__'
-        fields = ['id', 'role','module','action']
+        fields = ['id', 'role','module','action','module_action_assoc']
 class RolePermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = RolePermission
