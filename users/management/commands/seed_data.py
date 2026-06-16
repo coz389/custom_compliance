@@ -51,6 +51,9 @@ class Command(BaseCommand):
             {'name': 'Carrier Types', 'code': 'carrier_types', 'icon': 'shield', 'order': 15,'created_by':admin_user,'created_at':timezone.now()},
             {'name': 'Transport Modes', 'code': 'transport_modes', 'icon': 'users', 'order': 16,'created_by':admin_user,'created_at':timezone.now()},
             {'name': 'User Activity Logs', 'code': 'user_activity_logs', 'icon': 'history', 'order': 17,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Seaport Management', 'code': 'seaport_management', 'icon': 'anchor', 'order': 18,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Container Management', 'code': 'container_management', 'icon': 'archive', 'order': 19,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Package Management', 'code': 'package_management', 'icon': 'archive', 'order': 20,'created_by':admin_user,'created_at':timezone.now()}
         ]
         modules = {}
         for mod in modules_data:
@@ -110,6 +113,10 @@ class Command(BaseCommand):
                 'carrier_types': ['view', 'add', 'update', 'delete'],
                 'transport_modes': ['view', 'add', 'update', 'delete'],
                 'user_activity_logs': ['view', 'add', 'update', 'delete'],
+                'seaport_management': ['view', 'add', 'update', 'delete'],
+                'container_management': ['view', 'add', 'update', 'delete'],
+                'package_management': ['view', 'add', 'update', 'delete'],
+
             },
             'port_admin': {
                 'dashboard': ['view', 'add', 'update', 'export', 'import', 'download'],
@@ -129,6 +136,9 @@ class Command(BaseCommand):
                 'carrier_types': ['view', 'add', 'update', 'delete'],
                 'transport_modes': ['view', 'add', 'update', 'delete'],
                 'user_activity_logs': ['view', 'add', 'update', 'delete'],
+                'seaport_management': ['view', 'add', 'update', 'delete'],
+                'container_management': ['view', 'add', 'update', 'delete'],
+                'package_management': ['view', 'add', 'update', 'delete'],
             },
             'port_user': {
                 'dashboard': ['view', 'add', 'update', 'export', 'import', 'download'],

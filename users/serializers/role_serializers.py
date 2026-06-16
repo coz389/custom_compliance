@@ -54,7 +54,7 @@ class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         # fields = '__all__'
-        fields = ['id', 'name', 'code', 'description', 'status', 'created_at','created_by', 'updated_by', 'deleted_by']
+        fields = ['id', 'name', 'code', 'description', 'status', 'created_at','created_by', 'updated_by', 'updated_at' ,'deleted_by']
         read_only_fields = ['created_by', 'updated_by', 'deleted_by']
 
     def get_created_by_name(self, obj):
