@@ -22,11 +22,9 @@ class LoginSerializer(TokenObtainPairSerializer):
         pass 
      
     def validate(self, attrs):
-        # Default tokens (access & refresh) prapt karein
         data = super().validate(attrs)
         user = self.user
 
-        # 1. User details taiyar karein [History turn 22, 124]
         user_data = {
             "id": user.id,
             "first_name": user.first_name,
@@ -37,14 +35,17 @@ class LoginSerializer(TokenObtainPairSerializer):
             "role_name": user.role.name if user.role else None,
         }
 
-        # 2. User Privileges nikalien (Module.Action format mein) [History turn 16]
-        privileges = RolePermission.objects.filter(role=user.role)
+        privileges = RolePermission.objects.filter(role=user.role).select_related(
+            'module_action_assoc__module',
+            'module_action_assoc__action'
+        )
+
         privilege_list = [
-            f"{p.module.code}.{p.action.code}".upper() 
+            f"{p.module_action_assoc.module.code}.{p.module_action_assoc.action.code}".upper()
             for p in privileges
+            if p.module_action_assoc  # null check — FK null=True hai
         ]
 
-        # 3. Final results structure (access token key badal di gayi hai)
         custom_data = {
             "access_token": data['access'],
             "user": user_data,
