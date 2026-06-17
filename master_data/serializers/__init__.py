@@ -6,6 +6,8 @@ from .equipment_serializers import EquipmentListRequestSerializer, EquipmentSeri
 from .dropdown_serializers import CountryDropdownSerializer, StateDropdownSerializer
 from .document_type_serializers import DocumentTypeSerializer,DocumentTypeListRequestSerializer
 from .seaport_serializers import SeaportListRequestSerializer, SeaportSerializer
+from .customer_serializers import CustomerSerializer, CustomerListRequestSerializer
+from .company_serializers import CompanySerializer, CompanyListRequestSerializer
 
 
 __all__=[
@@ -17,4 +19,6 @@ __all__=[
     'CountryDropdownSerializer','StateDropdownSerializer',
     'DocumentTypeSerializer','DocumentTypeListRequestSerializer',
     'SeaportSerializer','SeaportListRequestSerializer',
+    'CustomerSerializer','CustomerListRequestSerializer',
+    'CompanySerializer','CompanyListRequestSerializer',
 ]

@@ -37,7 +37,7 @@ class SeaportFilter(django_filters.FilterSet):
 class SeaportListView(generics.GenericAPIView):
     queryset = Seaport.objects.select_related(
         "country", "created_by", "updated_by"
-    ).filter(status=True)
+    ).all()
     serializer_class = SeaportSerializer
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
     module_code = "seaport_management"

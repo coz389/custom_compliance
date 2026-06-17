@@ -46,7 +46,7 @@ class ContainerFilter(django_filters.FilterSet):
 class ContainerListView(generics.GenericAPIView):
     queryset = Container.objects.select_related(
         "transport", "created_by", "updated_by"
-    ).filter(status=True)
+    ).all()
     serializer_class = ContainerSerializer
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
     module_code = "container_management"
