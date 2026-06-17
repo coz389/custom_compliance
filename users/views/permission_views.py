@@ -1,12 +1,126 @@
 from rest_framework import generics, permissions
 from users.models import RolePermission
-from users.serializers import RolePermissionSerializer,RolePermissionCreateUpdateSerializer
+from users.serializers import RolePermissionSerializer,RolePermissionCreateUpdateSerializer,RolePermissionListSerializer
 from core.permissions import HasModulePermission
 import django_filters
 from django.db.models import Q
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from users.serializers import ModuleActionDropdownSerializer
 from users.models import ModuleActionAssoc
+
+
+class RolePermissionFilter(django_filters.FilterSet):
+    role_code = django_filters.CharFilter(field_name='role__code',lookup_expr='icontains')
+    module_code = django_filters.CharFilter(field_name='module__code',lookup_expr='icontains')
+    action_name = django_filters.CharFilter(field_name='action__name',lookup_expr='icontains')
+    # Date filter: match specific date
+    created_at = django_filters.DateFilter(field_name='created_at', lookup_expr='date')
+    # Range filter: match between two dates (optional but useful)
+    created_at_min = django_filters.DateFilter(field_name='created_at', lookup_expr='date__gte')
+    created_at_max = django_filters.DateFilter(field_name='created_at', lookup_expr='date__lte')
+    
+    class Meta:
+        model = RolePermission
+        fields = ['id', 'role','role_code','module','module_code','action','action_name','created_by','created_at']
+
+
+
+class RolePermissionListView(generics.GenericAPIView):
+    """
+    List all roles with filtering using POST method
+    """
+    queryset = RolePermission.objects.select_related('created_by', 'updated_by')
+    serializer_class = RolePermissionListSerializer
+    permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+    module_code = 'user_roles'
+
+    def get_action_code(self):
+        return 'view'
+
+    def check_permissions(self, request):
+        self.action_code = self.get_action_code()
+        super().check_permissions(request)
+
+    @extend_schema(
+        request=RolePermissionListSerializer, # Request body schema for filtering and pagination to show in Swagger
+        responses={200: RolePermissionListSerializer(many=True)},
+        tags=['Roles Permission Management'], # Grouping in Swagger UI
+        description="List all active roles permission with optional filtering, sorting, and pagination. Use POST method to send filter criteria in the request body.", # Detailed description for Swagger UI
+        summary="List Roles Permission (with filtering)", # Swagger UI heading for this endpoint
+        operation_id="v1_role_permission_list_post" # URL fragment for this operation in Swagger UI
+    )
+
+    def post(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        
+        # Clean request data: strip spaces from keys and values
+        clean_data = {k.strip(): (v.strip() if isinstance(v, str) else v) 
+                      for k, v in request.data.items()}
+        
+        # 1. Apply filters
+        filterset = RolePermissionFilter(clean_data, queryset=queryset)
+        if filterset.is_valid():
+            queryset = filterset.qs
+        else:
+            return Response(filterset.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        # 2. Apply Custom Ordering
+        sort_column = clean_data.get('sort_column', 'created_at')
+        sort_order = clean_data.get('sort_order', 'desc') # default to newest first
+        
+        # Validate sort_column exists in model
+        allowed_columns = [f.name for f in RolePermission._meta.fields]
+        if sort_column in allowed_columns:
+            prefix = '-' if sort_order.lower() == 'desc' else ''
+            queryset = queryset.order_by(f'{prefix}{sort_column}')
+        else:
+            queryset = queryset.order_by(f'{sort_column}')  # safe default
+
+
+        # --- GLOBAL SEARCH LOGIC ---
+        search = clean_data.get('search')
+        if search:
+            # Yeh name, code, ya description mein se kahin bhi match karega (OR condition)
+            queryset = queryset.filter(
+                Q(role__name__icontains=search) |
+                Q(role__code__icontains=search) |
+                Q(module__name__icontains=search) |
+                Q(module__code__icontains=search) |
+                Q(action__name__icontains=search)
+            )
+
+
+        # 3. Custom Pagination
+        paginator = self.pagination_class()
+        # Get page and page_size from body
+        page_num = clean_data.get('page', 1)
+        page_size = clean_data.get('page_size', paginator.page_size)
+        
+        # Override paginator attributes for this request
+        paginator.page_size = page_size
+        
+        # We need to trick DRF paginator to read page from our clean_data instead of query_params
+        # Or we can manually paginate
+        try:
+            # Standard paginator uses query_params, so we override the request's query_params temporarily
+            # But a cleaner way is to set the page number manually if possible.
+            # For simplicity, let's inject into request.query_params for the paginator to find it
+            request.query_params._mutable = True
+            request.query_params['page'] = page_num
+            request.query_params['page_size'] = page_size
+            request.query_params._mutable = False
+            
+            page = paginator.paginate_queryset(queryset, request, view=self)
+            
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return paginator.get_paginated_response(serializer.data)
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
 
 
 class RolePermissionListCreateView(generics.ListCreateAPIView):

@@ -36,11 +36,27 @@ class RolePermissionCreateUpdateSerializer(serializers.ModelSerializer):
         # fields = '__all__'
         fields = ['id', 'role','module','action','module_action_assoc']
 class RolePermissionSerializer(serializers.ModelSerializer):
+    role_name = serializers.CharField(source='role.name', read_only=True)
+    role_code = serializers.CharField(source='role.code', read_only=True)
+    module_name = serializers.CharField(source='module.name', read_only=True)
+    module_code = serializers.CharField(source='module.code', read_only=True)
+    action_name = serializers.CharField(source='action.name', read_only=True)
     class Meta:
         model = RolePermission
         # fields = '__all__'
-        fields = ['id', 'role','module','action','created_by','created_at', 'updated_by', 'updated_at']
+        fields = ['id', 'role','role_name','role_code','module','module_name','module_code','action','action_name','created_by','created_at', 'updated_by', 'updated_at']
 
+
+class RolePermissionListSerializer(serializers.ModelSerializer):
+    role_name = serializers.CharField(source='role.name', read_only=True)
+    role_code = serializers.CharField(source='role.code', read_only=True)
+    module_name = serializers.CharField(source='module.name', read_only=True)
+    module_code = serializers.CharField(source='module.code', read_only=True)
+    action_name = serializers.CharField(source='action.name', read_only=True)
+    class Meta:
+        model = RolePermission
+        # fields = '__all__'
+        fields = ['id', 'role','role_name','role_code','module','module_name','module_code','action','action_name','created_by','created_at', 'updated_by', 'updated_at']
 class ModuleActionDropdownSerializer(serializers.ModelSerializer):
     module = ModuleBasicSerializer(read_only=True)
     action = ActionBasicSerializer(read_only=True)

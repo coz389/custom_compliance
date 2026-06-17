@@ -6,7 +6,7 @@ from users.views import (
     UserListView, UserDetailView,UserActiveInactiveView, 
     RoleCreateView,RoleListView, RoleDetailView, 
     ModuleListCreateView, ModuleDetailView, 
-    RolePermissionListCreateView, RolePermissionDetailView,RolePermissionCreateView,ModuleActionAssocDropdownView
+    RolePermissionListCreateView,RolePermissionListView, RolePermissionDetailView,RolePermissionCreateView,ModuleActionAssocDropdownView
 )
 
 
@@ -39,7 +39,7 @@ urlpatterns = [
     # path('modules/<int:pk>/', ModuleDetailView.as_view(), name='module_detail'),
 
     # Role Permissions
-    path('role-permissions', RolePermissionListCreateView.as_view(), name='role_permission_list'),
+    path('role-permissions', RolePermissionListView.as_view(), name='role_permission_list'),
     path('role-permissions/add', RolePermissionCreateView.as_view(), name='role_permission_create'),
     path('module-action-assoc', ModuleActionAssocDropdownView.as_view(), name='module_action_assoc_list'),
     path('role-permissions/<int:pk>/', RolePermissionDetailView.as_view(), name='role_permission_detail'),
