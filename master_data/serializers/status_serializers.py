@@ -16,30 +16,50 @@ class UserBasicSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+
+class StatusUpdateSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(read_only=True)
+    description = serializers.CharField(read_only=False)
+    created_by = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    updated_by = serializers.SlugRelatedField(slug_field='username', read_only=True)
+
+
+    class Meta:
+        model = Status
+        # fields = '__all__'
+        fields = ['id','description', 'status']
+    def get_created_by_name(self, obj):
+        if obj.created_by:
+            return getattr(obj.created_by, 'name', obj.created_by.username)
+        return None
+    
+    def create(self, validated_data):
+        return super().create(validated_data)
 class StatusSerializer(serializers.ModelSerializer):
-    def validate_name(self, value):
-        if not value or not value.strip():
-            raise serializers.ValidationError("Status name cannot be empty.")
+    name = serializers.CharField(read_only=True)
+    # def validate_name(self, value):
+    #     if not value or not value.strip():
+    #         raise serializers.ValidationError("Status name cannot be empty.")
         
-        instance = self.instance 
-        query = Status.all_objects.filter(name__iexact=value)
+    #     instance = self.instance 
+    #     query = Status.all_objects.filter(name__iexact=value)
         
-        if instance:
-            query = query.exclude(pk=instance.pk)
+    #     if instance:
+    #         query = query.exclude(pk=instance.pk)
             
-        if query.exists():
-            custom_error_payload = {
-                "success": False,
-                "message": "Status metadata integrity validation failed.",
-                "data": {
-                    "name": [
-                        "status with this name already exists."
-                    ]
-                }
-            }
-            raise serializers.ValidationError(custom_error_payload)
+    #     if query.exists():
+    #         custom_error_payload = {
+    #             "success": False,
+    #             "message": "Status metadata integrity validation failed.",
+    #             "data": {
+    #                 "name": [
+    #                     "status with this name already exists."
+    #                 ]
+    #             }
+    #         }
+    #         raise serializers.ValidationError(custom_error_payload)
         
-        return value
+    #     return value
     
     created_by = serializers.SlugRelatedField(slug_field='username', read_only=True)
     updated_by = serializers.SlugRelatedField(slug_field='username', read_only=True)

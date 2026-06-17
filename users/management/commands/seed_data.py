@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from users.models import User, Role,Action, Module, RolePermission
+from users.models import User, Role,Action, Module, RolePermission,ModuleActionAssoc
 from django.utils import timezone
 
 
@@ -91,6 +91,55 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(f'  Role already exists: {obj.name}')
 
+
+        # ---------- Module Action Permissions ----------
+        module_action_map ={
+            # all modules, all actions maps
+            'dashboard': ['view', 'add', 'update', 'export', 'import', 'download'],
+            'shipments': ['view', 'add', 'update', 'delete','export', 'import', 'download','cancel','copy','draft','reject'],
+            'customers': ['view', 'add', 'update', 'delete','export', 'import', 'download','cancel','copy','draft','reject'],
+            'document_type': ['view', 'add', 'update', 'delete','export', 'import', 'download'],
+            'equipment': ['view', 'add', 'update', 'delete'],
+            'equipment_types': ['view', 'add', 'update', 'delete'],
+            'email_templates': ['view', 'add', 'update', 'delete'],
+            'shipper_freight_forwarder_map': ['view', 'add', 'update', 'delete'],
+            'user_management': ['view', 'add', 'update', 'delete'],
+            'user_roles': ['view', 'add', 'update', 'delete'],
+            'status': ['view', 'add', 'update', 'delete'],
+            'regions': ['view', 'add', 'update', 'delete'],
+            'sub_regions': ['view', 'add', 'update', 'delete'],
+            'countries': ['view', 'add', 'update', 'delete'],
+            'carrier_types': ['view', 'add', 'update', 'delete'],
+            'transport_modes': ['view', 'add', 'update', 'delete'],
+            'user_activity_logs': ['view', 'add', 'update', 'delete'],
+            'seaport_management': ['view', 'add', 'update', 'delete'],
+            'container_management': ['view', 'add', 'update', 'delete'],
+            'package_management': ['view', 'add', 'update', 'delete'],
+        }
+        module_action_assoc_map = {}
+        for module_code, action_codes in module_action_map.items():
+            module = modules[module_code]
+            for action_code in action_codes:
+                action = actions[action_code]
+                obj, created = ModuleActionAssoc.objects.get_or_create(
+                    module=module,
+                    action=action,
+                    defaults={
+                        "created_by": admin_user,
+                        "created_at": timezone.now()
+                    }
+                )
+                module_action_assoc_map[
+                    f"{module_code}_{action_code}"
+                ] = obj
+
+                if created:
+                    self.stdout.write(f'Created ModuleActionAssoc: {module.name} | {action.name}')
+                # else skip
+            
+
+       
+
         # ---------- Role Permissions ----------
         # Define mapping: role_code -> module_code -> list of action codes
         permissions_map = {
@@ -161,13 +210,54 @@ class Command(BaseCommand):
                 module = modules[module_code]
                 for action_code in action_codes:
                     action = actions[action_code]
-                    obj, created = RolePermission.objects.get_or_create(
+                    module_action_assoc = module_action_assoc_map[
+                        f"{module_code}_{action_code}"
+                    ]
+                    obj, created = RolePermission.objects.update_or_create(
                         role=role,
-                        module=module,
-                        action=action,
-                        created_by=admin_user,
-                        created_at=timezone.now()
+                        # module=module,
+                        # action=action,
+                        module=module_action_assoc.module,
+                        action=module_action_assoc.action,
+                        # module_action_assoc=module_action_assoc,
+                        defaults={
+                            "module_action_assoc": module_action_assoc,
+                            "created_by": admin_user,
+                            "created_at": timezone.now()
+                        }
                     )
+                    
+                    # Existing record hai lekin module_action_assoc empty hai
+                    if not created:
+
+                        fields_to_update = []
+
+                        if obj.module_action_assoc_id != module_action_assoc.id:
+                            obj.module_action_assoc = module_action_assoc
+                            fields_to_update.append("module_action_assoc")
+
+                        if fields_to_update:
+                            obj.save(update_fields=fields_to_update)
+
+                    if created:
+                        self.stdout.write(
+                            self.style.SUCCESS(
+                                f'Created: '
+                                f'{role.name} | '
+                                f'{module_action_assoc.module.name} | '
+                                f'{module_action_assoc.action.name}'
+                            )
+                        )
+                    else:
+                        self.stdout.write(
+                            self.style.WARNING(
+                                f'Updated: '
+                                f'{role.name} | '
+                                f'{module_action_assoc.module.name} | '
+                                f'{module_action_assoc.action.name}'
+                            )
+                        )
+
                     if created:
                         self.stdout.write(f'  Perm: {role.name} | {module.name} | {action.name}')
                     # else skip

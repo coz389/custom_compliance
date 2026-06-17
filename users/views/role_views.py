@@ -9,6 +9,7 @@ import django_filters
 from django.db.models import Q
 from django.contrib.auth import get_user_model
 
+
 from drf_spectacular.utils import extend_schema # Swagger customization
 
 User = get_user_model()
@@ -183,4 +184,5 @@ class RoleDetailView(generics.RetrieveUpdateDestroyAPIView):
             "message": "Role deleted successfully",
             "data": serializer.data
         }, status=status.HTTP_200_OK)
+
 

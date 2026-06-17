@@ -6,15 +6,15 @@ import django_filters
 from django.db.models import Q
 from django.contrib.auth import get_user_model
 
-from master_data.models import Status
-from master_data.serializers import StatusListRequestSerializer,StatusSerializer,StatusUpdateSerializer
+from master_data.models import DocumentType
+from master_data.serializers import DocumentTypeSerializer, DocumentTypeListRequestSerializer
 
 
 from drf_spectacular.utils import extend_schema # Swagger customization
 
 User = get_user_model()
 
-class StatusFilter(django_filters.FilterSet):
+class DocumentTypeFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(lookup_expr='icontains')
     # Date filter: match specific date
     created_at = django_filters.DateFilter(field_name='created_at', lookup_expr='date')
@@ -23,8 +23,8 @@ class StatusFilter(django_filters.FilterSet):
     created_at_max = django_filters.DateFilter(field_name='created_at', lookup_expr='date__lte')
     
     class Meta:
-        model = Status
-        fields = ['name', 'created_by', 'status', 'created_at','created_by']
+        model = DocumentType
+        fields = ['name','transport_mode', 'created_by', 'status', 'created_at','created_by']
 
 
 
@@ -144,7 +144,6 @@ class StatusDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Status.objects.all()
     serializer_class = StatusSerializer
-    # serializer_class = StatusUpdateSerializer
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
     module_code = 'status'
     action_code = 'view'  # default to view, will adjust in check_permissions

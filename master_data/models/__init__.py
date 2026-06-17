@@ -6,7 +6,7 @@ from .container import Container
 from .country import Country
 from .seaport import Seaport
 from .state import State
-
+from .document_type import DocumentType
 __all__=[
     'Status',
     'CarrierType',
@@ -16,4 +16,5 @@ __all__=[
     "Seaport",
     "State", 
     "Country",
+    "DocumentType",
 ]

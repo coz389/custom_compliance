@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from users.models import User, Role, Module, RolePermission, user
@@ -13,7 +14,44 @@ class UserBasicSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'email', 'username']
         read_only_fields = fields
+
+
+class LoginSerializer(TokenObtainPairSerializer):
+
+    class Meta:
+        pass 
+     
+    def validate(self, attrs):
+        # Default tokens (access & refresh) prapt karein
+        data = super().validate(attrs)
+        user = self.user
+
+        # 1. User details taiyar karein [History turn 22, 124]
+        user_data = {
+            "id": user.id,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "name": f"{user.first_name} {user.last_name}",
+            "email": user.email,
+            "role_id": user.role.id if user.role else None,
+            "role_name": user.role.name if user.role else None,
+        }
+
+        # 2. User Privileges nikalien (Module.Action format mein) [History turn 16]
+        privileges = RolePermission.objects.filter(role=user.role)
+        privilege_list = [
+            f"{p.module.code}.{p.action.code}".upper() 
+            for p in privileges
+        ]
+
+        # 3. Final results structure (access token key badal di gayi hai)
+        custom_data = {
+            "access_token": data['access'],
+            "user": user_data,
+            "user_privileges": privilege_list
+        }
         
+        return custom_data
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         write_only=True, 
