@@ -219,11 +219,11 @@ class Command(BaseCommand):
                         role=role,
                         # module=module,
                         # action=action,
-                        module=module_action_assoc.module,
-                        action=module_action_assoc.action,
-                        # module_action_assoc=module_action_assoc,
+                        # module=module_action_assoc.module,
+                        # action=module_action_assoc.action,
+                        module_action_assoc=module_action_assoc,
                         defaults={
-                            "module_action_assoc": module_action_assoc,
+                            # "module_action_assoc": module_action_assoc,
                             "created_by": admin_user,
                             "created_at": timezone.now()
                         }

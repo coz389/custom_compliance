@@ -2,17 +2,22 @@ from rest_framework import generics, permissions
 from users.models import RolePermission
 from users.serializers import RolePermissionSerializer,RolePermissionCreateUpdateSerializer,RolePermissionListSerializer
 from core.permissions import HasModulePermission
+from rest_framework.views import APIView
 import django_filters
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
+from django.db import transaction
+from rest_framework.response import Response
+from rest_framework import status, permissions
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from users.serializers import ModuleActionDropdownSerializer
-from users.models import ModuleActionAssoc
+from users.models import ModuleActionAssoc,Role
 
 
 class RolePermissionFilter(django_filters.FilterSet):
     role_code = django_filters.CharFilter(field_name='role__code',lookup_expr='icontains')
-    module_code = django_filters.CharFilter(field_name='module__code',lookup_expr='icontains')
-    action_name = django_filters.CharFilter(field_name='action__name',lookup_expr='icontains')
+    # module_code = django_filters.CharFilter(field_name='module__code',lookup_expr='icontains')
+    # action_name = django_filters.CharFilter(field_name='action__name',lookup_expr='icontains')
     # Date filter: match specific date
     created_at = django_filters.DateFilter(field_name='created_at', lookup_expr='date')
     # Range filter: match between two dates (optional but useful)
@@ -21,7 +26,7 @@ class RolePermissionFilter(django_filters.FilterSet):
     
     class Meta:
         model = RolePermission
-        fields = ['id', 'role','role_code','module','module_code','action','action_name','created_by','created_at']
+        fields = ['id', 'role','role_code','created_by','created_at'] #'module','module_code','action','action_name',
 
 
 
@@ -163,21 +168,21 @@ class RolePermissionDetailView(generics.RetrieveUpdateDestroyAPIView):
     Retrieve, update or delete a specific role permission (admin only)
     """
     queryset = RolePermission.objects.all()
-    serializer_class = RolePermissionSerializer
+    serializer_class = RolePermissionSerializer #
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
     module_code = 'user_roles'
 
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
-            return RolePermissionCreateUpdateSerializer 
+            return RolePermissionCreateUpdateSerializer
         # for others default serializer
         return self.serializer_class
     
     def get_action_code(self):
         if self.request.method == 'GET':
             return 'view'
-        elif self.request.method in ['PUT', 'PATCH']:
-            return 'update'
+        # elif self.request.method in ['PUT', 'PATCH']:
+        #     return 'update'
         # elif self.request.method == 'DELETE':
         #     return 'delete'
         return None
@@ -185,6 +190,61 @@ class RolePermissionDetailView(generics.RetrieveUpdateDestroyAPIView):
     def check_permissions(self, request):
         self.action_code = self.get_action_code()
         super().check_permissions(request)
+
+
+
+
+
+class BulkRolePermissionView(APIView):
+    permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+    module_code = 'user_roles'
+
+    def get_action_code(self):
+        return 'update'
+
+    def check_permissions(self, request):
+        self.action_code = self.get_action_code()
+        super().check_permissions(request)
+
+    def put(self, request, role_id):
+        role = get_object_or_404(Role, pk=role_id)
+        assoc_ids = request.data.get('module_action_assoc', [])
+
+        if not isinstance(assoc_ids, list) or not assoc_ids:
+            return Response(
+                {"module_action_assoc": "Must be a non-empty list of IDs."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        assocs = ModuleActionAssoc.objects.filter(id__in=assoc_ids)
+        if assocs.count() != len(assoc_ids):
+            return Response(
+                {"module_action_assoc": "One or more IDs are invalid."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        with transaction.atomic():
+            RolePermission.objects.filter(role=role).delete()
+            RolePermission.objects.bulk_create([
+                RolePermission(
+                    role=role,
+                    module_action_assoc=assoc,
+                    created_by=request.user
+                )
+                for assoc in assocs
+            ])
+        # ✅ Created records fetch data to serialize
+        # created = RolePermission.objects.filter(role=role).select_related(
+        #     'role', 'module_action_assoc'
+        # )
+        created = RolePermission.objects.filter(role=role).select_related(
+            'role',
+            'module_action_assoc',
+            'module_action_assoc__module',
+            'module_action_assoc__action'
+        )
+        serializer = RolePermissionListSerializer(created, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 @extend_schema(
     responses={200: ModuleActionDropdownSerializer(many=True)},
