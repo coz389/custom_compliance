@@ -6,7 +6,7 @@ from users.views import (
     UserListView, UserDetailView,UserActiveInactiveView, 
     RoleCreateView,RoleListView, RoleDetailView, 
     ModuleListCreateView, ModuleDetailView, 
-    RolePermissionListCreateView,RolePermissionListView, RolePermissionDetailView,RolePermissionCreateView,ModuleActionAssocDropdownView
+    RolePermissionListCreateView,RolePermissionListView, RolePermissionDetailView,RolePermissionCreateView,ModuleActionAssocDropdownView,BulkRolePermissionView
 )
 
 
@@ -41,6 +41,6 @@ urlpatterns = [
     # Role Permissions
     path('role-permissions', RolePermissionListView.as_view(), name='role_permission_list'),
     path('role-permissions/add', RolePermissionCreateView.as_view(), name='role_permission_create'),
-    path('module-action-assoc', ModuleActionAssocDropdownView.as_view(), name='module_action_assoc_list'),
-    path('role-permissions/<int:pk>/', RolePermissionDetailView.as_view(), name='role_permission_detail'),
+    path('module-action-assoc', ModuleActionAssocDropdownView.as_view(), name='module_action_assoc_list'),#drop down
+    path('role-permissions/<int:role_id>/bulk-assign/', BulkRolePermissionView.as_view(), name='role_permission_update'),
 ]

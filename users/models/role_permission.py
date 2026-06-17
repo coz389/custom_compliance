@@ -9,8 +9,8 @@ from .module_action_assoc import ModuleActionAssoc
 
 class RolePermission(BaseModel):
     role = models.ForeignKey(Role, on_delete=models.CASCADE, related_name='role_permissions')
-    module = models.ForeignKey(Module, on_delete=models.CASCADE)
-    action = models.ForeignKey(Action, on_delete=models.CASCADE)
+    # module = models.ForeignKey(Module, on_delete=models.CASCADE)
+    # action = models.ForeignKey(Action, on_delete=models.CASCADE)
     module_action_assoc = models.ForeignKey(
         ModuleActionAssoc,
         null=True, blank=True,  # Initially null, assign after role creation
@@ -19,7 +19,7 @@ class RolePermission(BaseModel):
 
     class Meta:
         db_table = 'role_permissions'
-        unique_together = ('role', 'module', 'action',)
+        unique_together = ('role', 'module_action_assoc',)
 
     def full_clean(self):
         if (self.module_action_assoc.module_id != self.module_id):
@@ -29,7 +29,7 @@ class RolePermission(BaseModel):
             raise ValidationError("Action mismatch with ModuleActionAssoc.")
         
     def save(self, *args, **kwargs):
-        self.full_clean()
+        # self.full_clean()
         super().save(*args, **kwargs)
 
     def __str__(self):
