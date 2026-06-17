@@ -4,7 +4,9 @@ from master_data.views import (
     CountryDropdownView, StateDropdownView,CityCreateView, CityDetailView, CityListView,
     ContainerCreateView, ContainerDetailView, ContainerListView,
     EquipmentCreateView, EquipmentDetailView, EquipmentListView,
-    SeaportCreateView, SeaportDetailView, SeaportListView
+    SeaportCreateView, SeaportDetailView, SeaportListView,
+    CustomerCreateView, CustomerDetailView, CustomerListView,
+    CompanyCreateView, CompanyDetailView, CompanyListView
 )
 
 urlpatterns = [
@@ -34,5 +36,13 @@ urlpatterns = [
     # path('carrier-types', CarrierTypeListView.as_view(), name='carrier_types_list_filter'),
     # path('carrier-types/add', CarrierTypeCreateView.as_view(), name='carrier_types_create'),
     # path('carrier-types/<int:pk>', CarrierTypeDetailView.as_view(), name='carrier_types_detail'),
+    # Customers
+    path('customers', CustomerListView.as_view(), name='customer_list_filter'),
+    path('customers/add', CustomerCreateView.as_view(), name='customer_create'),
+    path('customers/<int:pk>', CustomerDetailView.as_view(), name='customer_detail'),
+    # Companies
+    path('companies', CompanyListView.as_view(), name='company_list_filter'),
+    path('companies/add', CompanyCreateView.as_view(), name='company_create'),
+    path('companies/<int:pk>', CompanyDetailView.as_view(), name='company_detail'),
 ]
 

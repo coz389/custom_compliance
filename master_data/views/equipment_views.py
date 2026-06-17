@@ -26,7 +26,7 @@ class EquipmentFilter(django_filters.FilterSet):
 
 
 class EquipmentListView(generics.GenericAPIView):
-    queryset = Equipment.objects.filter(status=True)
+    queryset = Equipment.objects.all()
     serializer_class = EquipmentSerializer
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
     module_code = "package_management"

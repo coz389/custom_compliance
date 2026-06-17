@@ -21,24 +21,21 @@ class StateBasicSerializer(serializers.ModelSerializer):
 
 
 class CitySerializer(serializers.ModelSerializer):
-    state = StateBasicSerializer(read_only=True)
-    country = CountryBasicSerializer(read_only=True)
-
     state_id = serializers.PrimaryKeyRelatedField(
         queryset=State.objects.all(),
         source="state",
-        write_only=True,
         required=False,
         allow_null=True,
     )
+    state_name = serializers.CharField(source="state.state_name", read_only=True, allow_null=True, default=None)
 
     country_id = serializers.PrimaryKeyRelatedField(
         queryset=Country.objects.all(),
         source="country",
-        write_only=True,
         required=False,
         allow_null=True,
     )
+    country_name = serializers.CharField(source="country.country_name", read_only=True, allow_null=True, default=None)
 
     created_by = serializers.SlugRelatedField(slug_field="username", read_only=True)
     updated_by = serializers.SlugRelatedField(slug_field="username", read_only=True)
@@ -49,13 +46,13 @@ class CitySerializer(serializers.ModelSerializer):
             "id",
             "city_name",
             "state_id",
-            "state",
+            "state_name",
             "country_id",
-            "country",
-            "unloc",
-            "utc_offset",
+            "country_name",
             "latitude",
             "longitude",
+            "unloc",
+            "utc_offset",
             "status",
             "created_by",
             "created_at",

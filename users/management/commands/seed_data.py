@@ -53,7 +53,9 @@ class Command(BaseCommand):
             {'name': 'User Activity Logs', 'code': 'user_activity_logs', 'icon': 'history', 'order': 17,'created_by':admin_user,'created_at':timezone.now()},
             {'name': 'Seaport Management', 'code': 'seaport_management', 'icon': 'anchor', 'order': 18,'created_by':admin_user,'created_at':timezone.now()},
             {'name': 'Container Management', 'code': 'container_management', 'icon': 'archive', 'order': 19,'created_by':admin_user,'created_at':timezone.now()},
-            {'name': 'Package Management', 'code': 'package_management', 'icon': 'archive', 'order': 20,'created_by':admin_user,'created_at':timezone.now()}
+            {'name': 'Package Management', 'code': 'package_management', 'icon': 'archive', 'order': 20,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Company Management', 'code': 'companies', 'icon': 'archive', 'order': 21,'created_by':admin_user,'created_at':timezone.now()}
+
         ]
         modules = {}
         for mod in modules_data:
@@ -165,7 +167,7 @@ class Command(BaseCommand):
                 'seaport_management': ['view', 'add', 'update', 'delete'],
                 'container_management': ['view', 'add', 'update', 'delete'],
                 'package_management': ['view', 'add', 'update', 'delete'],
-
+                'companies': ['view', 'add', 'update', 'delete']
             },
             'port_admin': {
                 'dashboard': ['view', 'add', 'update', 'export', 'import', 'download'],
