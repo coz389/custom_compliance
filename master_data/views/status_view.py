@@ -138,7 +138,7 @@ class StatusCreateView(generics.CreateAPIView):
         super().check_permissions(request)
 
 @extend_schema(tags=['Status Management']) 
-class StatusDetailView(generics.RetrieveUpdateDestroyAPIView):
+class StatusDetailView(generics.RetrieveUpdateAPIView):
     """
     Retrieve, update or delete a specific status (admin only)
     """

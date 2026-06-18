@@ -105,7 +105,7 @@ class UserListView(APIView):
         serializer = UserSerializer(queryset, many=True)
         return Response(serializer.data)
 @extend_schema(tags=['Users Management']) 
-class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
+class UserDetailView(generics.RetrieveUpdateAPIView):#RetrieveUpdateDestroyAPIView
     """
     Retrieve, update or delete a specific user (admin only)
     """
@@ -121,14 +121,15 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
         elif self.request.method in ['PUT', 'PATCH']:
             return 'update'
         elif self.request.method == 'DELETE':
-            return 'delete'
+            # return 'delete'
+            return None
         return None
 
     def check_permissions(self, request):
         self.action_code = self.get_action_code()
         super().check_permissions(request)
-
-    def destroy(self, request, *args, **kwargs) -> Response:
+    """
+    def destroy(self, request, *args, **kwargs):
         # 1. Look up object inside default active manager scope
         instance = self.get_object()
         
@@ -150,7 +151,7 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
             "message": "User soft-deleted successfully",
             "data": serializer.data
         }, status=status.HTTP_200_OK)
-    
+    """
 
 @extend_schema(tags=['Users Management']) 
 class UserActiveInactiveView(APIView):
