@@ -51,14 +51,17 @@ class CompanySerializer(serializers.ModelSerializer):
 
         return value
 
+    customer_id = serializers.PrimaryKeyRelatedField(
+        queryset=Customer.objects.all(), source="customer", required=False, allow_null=True,
+    )
+    customer_name = serializers.CharField(source="customer.customer_name", read_only=True, allow_null=True, default=None)
     created_by = serializers.SlugRelatedField(slug_field='username', read_only=True)
     updated_by = serializers.SlugRelatedField(slug_field='username', read_only=True)
-    customer = serializers.PrimaryKeyRelatedField(queryset=Customer.objects.all())
 
     class Meta:
         model = Company
         fields = [
-            'id', 'customer', 'company_name', 'company_code', 'status',
+            'id', 'customer_id', 'customer_name', 'company_name', 'company_code', 'status',
             'domain_name', 'contact_email', 'contact_phone',
             'created_by', 'created_at', 'updated_by', 'updated_at'
         ]

@@ -4,10 +4,12 @@ from rest_framework import generics, permissions
 
 from core.permissions import HasModulePermission
 from master_data.models.country import Country
+from master_data.models.customer import Customer
 from master_data.models.equipment import Equipment
 from master_data.models.state import State
 from master_data.serializers.dropdown_serializers import (
     CountryDropdownSerializer,
+    CustomerDropdownSerializer,
     EquipmentDropdownSerializer,
     StateDropdownSerializer,
 )
@@ -120,3 +122,37 @@ class EquipmentDropdownView(generics.ListAPIView):
             queryset = queryset.filter(Q(code__icontains=search) | Q(type__icontains=search))
 
         return queryset.order_by("code")
+
+
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="customer_name",
+            description="Optional case-insensitive customer name search.",
+            required=False,
+            type=str,
+            location=OpenApiParameter.QUERY,
+        ),
+    ],
+    responses={200: CustomerDropdownSerializer(many=True)},
+    tags=["Dropdown lists"],
+    description="Dropdown list of active customers.",
+    summary="Customer Dropdown",
+    operation_id="v1_customer_list_dropdown",
+)
+class CustomerDropdownView(generics.ListAPIView):
+    serializer_class = CustomerDropdownSerializer
+    pagination_class = None
+    permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+
+    module_code = "customers"
+    action_code = "view"
+
+    def get_queryset(self):
+        queryset = Customer.objects.filter(status=True)
+        customer_name = self.request.query_params.get("customer_name", "").strip()
+
+        if customer_name:
+            queryset = queryset.filter(customer_name__icontains=customer_name)
+
+        return queryset.order_by("customer_name")
