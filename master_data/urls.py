@@ -6,7 +6,7 @@ from master_data.views import (
     EquipmentCreateView, EquipmentDetailView, EquipmentListView,
     SeaportCreateView, SeaportDetailView, SeaportListView,
     CustomerCreateView, CustomerDetailView, CustomerListView,
-    CompanyCreateView, CompanyDetailView, CompanyListView
+    CompanyCreateView, CompanyDetailView, CompanyListView,CustomerDropdownView
 )
 
 urlpatterns = [
@@ -44,5 +44,6 @@ urlpatterns = [
     path('companies', CompanyListView.as_view(), name='company_list_filter'),
     path('companies/add', CompanyCreateView.as_view(), name='company_create'),
     path('companies/<int:pk>', CompanyDetailView.as_view(), name='company_detail'),
+    path('customer-companies', CustomerDropdownView.as_view(), name='customer_company_list'),
 ]
 

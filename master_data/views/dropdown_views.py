@@ -10,8 +10,9 @@ from master_data.serializers.dropdown_serializers import (
     CountryDropdownSerializer,
     EquipmentDropdownSerializer,
     StateDropdownSerializer,
+    CustomerDropdownSerializer
 )
-
+from master_data.models import Customer,Company
 
 @extend_schema(
     responses={200: CountryDropdownSerializer(many=True)},
@@ -103,3 +104,22 @@ class EquipmentDropdownView(generics.ListAPIView):
             queryset = queryset.filter(Q(code__icontains=search) | Q(type__icontains=search))
 
         return queryset.order_by("code")
+
+
+@extend_schema(
+    responses={200: CustomerDropdownSerializer(many=True)},
+    tags=["Dropdown lists"],
+    description="Dropdown list of customer & companies.",
+    summary="Customer & Company Dropdown",
+    operation_id="v1_customer_company_list",
+)
+class CustomerDropdownView(generics.ListAPIView):
+    serializer_class = CustomerDropdownSerializer
+    pagination_class = None
+    permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+
+    module_code = "companies"
+    action_code = "view"
+    
+    queryset = Customer.objects.filter(deleted_at__isnull=True, status=True).order_by('customer_name')
+

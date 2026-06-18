@@ -3,7 +3,7 @@ from .carrier_type_serializers import CarrierTypeSerializer,CarrierTypeListReque
 from .city_serializers import CitySerializer, CityListRequestSerializer
 from .container_serializers import ContainerListRequestSerializer, ContainerSerializer
 from .equipment_serializers import EquipmentListRequestSerializer, EquipmentSerializer
-from .dropdown_serializers import CountryDropdownSerializer, StateDropdownSerializer
+from .dropdown_serializers import CountryDropdownSerializer, StateDropdownSerializer,CustomerDropdownSerializer
 from .document_type_serializers import DocumentTypeSerializer,DocumentTypeListRequestSerializer
 from .seaport_serializers import SeaportListRequestSerializer, SeaportSerializer
 from .customer_serializers import CustomerSerializer, CustomerListRequestSerializer
@@ -16,7 +16,7 @@ __all__=[
     'CitySerializer','CityListRequestSerializer',
     'ContainerSerializer','ContainerListRequestSerializer',
     'EquipmentSerializer','EquipmentListRequestSerializer',
-    'CountryDropdownSerializer','StateDropdownSerializer',
+    'CountryDropdownSerializer','StateDropdownSerializer','CustomerDropdownSerializer',
     'DocumentTypeSerializer','DocumentTypeListRequestSerializer',
     'SeaportSerializer','SeaportListRequestSerializer',
     'CustomerSerializer','CustomerListRequestSerializer',

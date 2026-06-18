@@ -3,6 +3,7 @@ from rest_framework import serializers
 from master_data.models.country import Country
 from master_data.models.equipment import Equipment
 from master_data.models.state import State
+from master_data.models import Customer,Company
 
 
 class CountryDropdownSerializer(serializers.ModelSerializer):
@@ -39,3 +40,14 @@ class EquipmentDropdownSerializer(serializers.ModelSerializer):
         model = Equipment
         fields = ["id", "code", "type", "description"]
         read_only_fields = fields
+
+
+class CustomerDropdownSerializer(serializers.ModelSerializer):
+    companies = serializers.SerializerMethodField()
+    class Meta:
+        model = Customer
+        fields = ["id", "customer_name", "customer_code", "companies"]
+        read_only_fields = fields
+
+    def get_companies(self, obj):
+        return obj.company_set.values("id", "company_name", "company_code")
