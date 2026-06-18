@@ -9,6 +9,7 @@ from .state import State
 from .document_type import DocumentType
 from .customer import Customer
 from .company import Company
+from .customer_doc_assoc import CustomerDocAssoc
 
 __all__=[
     'Status',
@@ -22,4 +23,5 @@ __all__=[
     "DocumentType",
     "Customer",
     "Company",
+    "CustomerDocAssoc",
 ]
