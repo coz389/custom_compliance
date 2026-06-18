@@ -2,18 +2,15 @@ from rest_framework import serializers
 
 from master_data.models.country import Country
 from master_data.models.seaport import Seaport
-from master_data.serializers.city_serializers import CountryBasicSerializer
-
 
 class SeaportSerializer(serializers.ModelSerializer):
-    country = CountryBasicSerializer(read_only=True)
     country_id = serializers.PrimaryKeyRelatedField(
         queryset=Country.objects.all(),
         source="country",
-        write_only=True,
         required=False,
         allow_null=True,
     )
+    country_name = serializers.CharField(source="country.country_name", read_only=True, allow_null=True, default=None)
     created_by = serializers.SlugRelatedField(slug_field="username", read_only=True)
     updated_by = serializers.SlugRelatedField(slug_field="username", read_only=True)
 
@@ -28,7 +25,7 @@ class SeaportSerializer(serializers.ModelSerializer):
             "latitude",
             "longitude",
             "country_id",
-            "country",
+            "country_name",
             "tradelane_name",
             "created_by",
             "created_at",

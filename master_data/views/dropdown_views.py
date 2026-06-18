@@ -14,6 +14,15 @@ from master_data.serializers.dropdown_serializers import (
 
 
 @extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="country_name",
+            description="Optional case-insensitive country name search.",
+            required=False,
+            type=str,
+            location=OpenApiParameter.QUERY,
+        ),
+    ],
     responses={200: CountryDropdownSerializer(many=True)},
     tags=["Dropdown lists"],
     description="Dropdown list of countries.",
@@ -21,13 +30,21 @@ from master_data.serializers.dropdown_serializers import (
     operation_id="v1_country_list",
 )
 class CountryDropdownView(generics.ListAPIView):
-    queryset = Country.objects.all().order_by("country_name")
     serializer_class = CountryDropdownSerializer
     pagination_class = None
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
 
     module_code = "countries"
     action_code = "view"
+
+    def get_queryset(self):
+        queryset = Country.objects.all()
+        country_name = self.request.query_params.get("country_name", "").strip()
+
+        if country_name:
+            queryset = queryset.filter(country_name__icontains=country_name)
+
+        return queryset.order_by("country_name")
 
 
 @extend_schema(

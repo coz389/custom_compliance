@@ -117,6 +117,7 @@ class Command(BaseCommand):
             'seaport_management': ['view', 'add', 'update', 'delete'],
             'container_management': ['view', 'add', 'update', 'delete'],
             'package_management': ['view', 'add', 'update', 'delete'],
+            'companies': ['view', 'add', 'update', 'delete'],
         }
         module_action_assoc_map = {}
         for module_code, action_codes in module_action_map.items():
