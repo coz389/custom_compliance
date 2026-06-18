@@ -35,7 +35,7 @@ class CityListView(generics.GenericAPIView):
 
     queryset = City.objects.select_related(
         "state", "country", "created_by", "updated_by"
-    ).filter(status=True)
+    ).all()
 
     serializer_class = CitySerializer
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]

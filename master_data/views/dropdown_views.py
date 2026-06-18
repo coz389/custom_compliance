@@ -1,11 +1,14 @@
+from django.db.models import Q
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import generics, permissions
 
 from core.permissions import HasModulePermission
 from master_data.models.country import Country
+from master_data.models.equipment import Equipment
 from master_data.models.state import State
 from master_data.serializers.dropdown_serializers import (
     CountryDropdownSerializer,
+    EquipmentDropdownSerializer,
     StateDropdownSerializer,
 )
 
@@ -66,3 +69,37 @@ class StateDropdownView(generics.ListAPIView):
             queryset = queryset.filter(state_name__icontains=state_name)
 
         return queryset.order_by("state_name")
+
+
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="search",
+            description="Optional case-insensitive search by equipment code or type.",
+            required=False,
+            type=str,
+            location=OpenApiParameter.QUERY,
+        ),
+    ],
+    responses={200: EquipmentDropdownSerializer(many=True)},
+    tags=["Dropdown lists"],
+    description="Dropdown list of active equipment items.",
+    summary="Equipment Dropdown",
+    operation_id="v1_equipment_list_dropdown",
+)
+class EquipmentDropdownView(generics.ListAPIView):
+    serializer_class = EquipmentDropdownSerializer
+    pagination_class = None
+    permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+
+    module_code = "package_management"
+    action_code = "view"
+
+    def get_queryset(self):
+        queryset = Equipment.objects.filter(status=True)
+        search = self.request.query_params.get("search", "").strip()
+
+        if search:
+            queryset = queryset.filter(Q(code__icontains=search) | Q(type__icontains=search))
+
+        return queryset.order_by("code")

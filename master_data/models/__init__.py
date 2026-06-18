@@ -7,6 +7,9 @@ from .country import Country
 from .seaport import Seaport
 from .state import State
 from .document_type import DocumentType
+from .customer import Customer
+from .company import Company
+
 __all__=[
     'Status',
     'CarrierType',
@@ -17,4 +20,6 @@ __all__=[
     "State", 
     "Country",
     "DocumentType",
+    "Customer",
+    "Company",
 ]
