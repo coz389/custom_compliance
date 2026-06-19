@@ -1,5 +1,5 @@
 import django_filters
-from rest_framework import generics, permissions, status,serializers
+from rest_framework import generics, permissions, status,serializers as drf_serializers
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
@@ -9,7 +9,7 @@ from users.serializers import UserSerializer, UserCreateSerializer,UserListReque
 from core.permissions import HasModulePermission
 from rest_framework.views import APIView
 from django.db.models import Q
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema,inline_serializer, OpenApiExample,extend_schema_view
 from django.db import transaction
 from users.models import UserCompanyAssoc
 from master_data.models import Company
@@ -107,8 +107,115 @@ class UserListView(APIView):
 
         serializer = UserSerializer(queryset, many=True)
         return Response(serializer.data)
-@extend_schema(tags=['Users Management']) 
-class UserDetailView(generics.RetrieveUpdateAPIView):#RetrieveUpdateDestroyAPIView
+
+class UserDetailView(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+    module_code = 'user_management'
+    action_code = 'view'
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return UserSerializer
+        return UserUpdateSerializer
+
+    def get_action_code(self):
+        if self.request.method == 'GET':
+            return 'view'
+        elif self.request.method in ['PUT', 'PATCH']:
+            return 'update'
+        return None
+
+    def check_permissions(self, request):
+        self.action_code = self.get_action_code()
+        super().check_permissions(request)
+
+    @extend_schema(
+        tags=['Users Management'],
+        summary='Retrieve a user',
+        description='Get full details of a specific user including assigned companies.',
+        responses={200: UserSerializer},
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    @extend_schema(
+        tags=['Users Management'],
+        summary='Update user with company assignments',
+        description='Updates user fields and replaces all existing company assignments.',
+        request=inline_serializer(
+            name='UserUpdateWithCompaniesRequest',
+            fields={
+                'first_name':   drf_serializers.CharField(required=False),
+                'last_name':    drf_serializers.CharField(required=False),
+                'email':        drf_serializers.EmailField(required=False),
+                'role':         drf_serializers.IntegerField(required=False),
+                'is_active':    drf_serializers.BooleanField(required=False),
+                'company_ids':  drf_serializers.ListField(
+                    child=drf_serializers.IntegerField(min_value=1),
+                    required=False,
+                    help_text='List of Company IDs. Replaces existing assignments.',
+                ),
+            }
+        ),
+        examples=[
+            OpenApiExample(
+                name='Update user and assign companies',
+                value={
+                    'first_name': 'Abhishek',
+                    'last_name':  'Sahu',
+                    'role':       1,
+                    'is_active':  True,
+                    'company_ids': [1, 2, 3],
+                },
+                request_only=True,
+            )
+        ],
+        responses={200: UserSerializer},
+    )
+    def put(self, request, *args, **kwargs):
+        return super().put(request, *args, **kwargs)
+
+    @extend_schema(
+        tags=['Users Management'],
+        summary='Partially update user',
+        request=inline_serializer(
+            name='UserPartialUpdateRequest',
+            fields={
+                'first_name':  drf_serializers.CharField(required=False),
+                'last_name':   drf_serializers.CharField(required=False),
+                'email':       drf_serializers.EmailField(required=False),
+                'role':        drf_serializers.IntegerField(required=False),
+                'is_active':   drf_serializers.BooleanField(required=False),
+                'company_ids': drf_serializers.ListField(
+                    child=drf_serializers.IntegerField(min_value=1),
+                    required=False,
+                    help_text='List of Company IDs. Replaces existing assignments.',
+                ),
+            }
+        ),
+        responses={200: UserSerializer},
+    )
+    def patch(self, request, *args, **kwargs):
+        return super().patch(request, *args, **kwargs)
+
+    @transaction.atomic
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        company_ids = self.request.data.get('company_ids')
+
+        if not company_ids:
+            return
+
+        instance.user_company_assoc.all().delete()
+
+        UserCompanyAssoc.objects.bulk_create([
+            UserCompanyAssoc(user=instance, company_id=int(cid), created_by=instance)
+            for cid in company_ids
+        ])
+
+class UserDetailView123(generics.RetrieveUpdateAPIView):#RetrieveUpdateDestroyAPIView
     """
     Retrieve, update or delete a specific user (admin only)
     """
@@ -133,6 +240,7 @@ class UserDetailView(generics.RetrieveUpdateAPIView):#RetrieveUpdateDestroyAPIVi
     def check_permissions(self, request):
         self.action_code = self.get_action_code()
         super().check_permissions(request)
+        
 
     @transaction.atomic
     def perform_update(self, serializer):
@@ -143,7 +251,7 @@ class UserDetailView(generics.RetrieveUpdateAPIView):#RetrieveUpdateDestroyAPIVi
             return
         
         # Delete all existing associations
-        # instance.user_company_assoc.all().delete()
+        UserCompanyAssoc.objects.filter(user=instance).delete()
         
         if not company_ids:
             return

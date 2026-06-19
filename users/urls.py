@@ -39,7 +39,7 @@ urlpatterns = [
     # path('modules/<int:pk>/', ModuleDetailView.as_view(), name='module_detail'),
 
     # Role Permissions
-    path('role-permissions', RolePermissionListView.as_view(), name='role_permission_list'),
+    # path('role-permissions', RolePermissionListView.as_view(), name='role_permission_list'),
     path('role-permissions/add', RolePermissionCreateView.as_view(), name='role_permission_create'),
     path('module-action-assoc', ModuleActionAssocDropdownView.as_view(), name='module_action_assoc_list'),#drop down
     path('role-permissions/<int:role_id>/bulk-assign/', BulkRolePermissionView.as_view(), name='role_permission_update'),
