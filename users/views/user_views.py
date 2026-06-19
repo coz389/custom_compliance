@@ -1,15 +1,17 @@
 import django_filters
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status,serializers
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from yaml import serializer
-from users.serializers import UserSerializer, UserCreateSerializer,UserListRequestSerializer
+from users.serializers import UserSerializer, UserCreateSerializer,UserListRequestSerializer,UserUpdateSerializer
 from core.permissions import HasModulePermission
 from rest_framework.views import APIView
 from django.db.models import Q
 from drf_spectacular.utils import extend_schema
-
+from django.db import transaction
+from users.models import UserCompanyAssoc
+from master_data.models import Company
 User = get_user_model()
 
 class UserFilter(django_filters.FilterSet):
@@ -28,7 +30,7 @@ class UserFilter(django_filters.FilterSet):
 
 class UserListView(APIView):
     """
-    POST method ka upyog karke roles ki filtered list prapt karein.
+    POST method
     """
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
     module_code = 'user_management'
@@ -115,19 +117,44 @@ class UserDetailView(generics.RetrieveUpdateAPIView):#RetrieveUpdateDestroyAPIVi
     module_code = 'user_management'
     action_code = 'view'  # default to view, will adjust in check_permissions
 
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return UserSerializer
+        return UserUpdateSerializer
+
     def get_action_code(self):
         if self.request.method == 'GET':
             return 'view'
         elif self.request.method in ['PUT', 'PATCH']:
             return 'update'
-        elif self.request.method == 'DELETE':
-            # return 'delete'
-            return None
         return None
 
     def check_permissions(self, request):
         self.action_code = self.get_action_code()
         super().check_permissions(request)
+
+    @transaction.atomic
+    def perform_update(self, serializer):
+        # Get Primary table (User) Instance and Save to other table
+        instance = serializer.save()  
+        company_ids = self.request.data.get('company_ids')
+        if not company_ids:
+            return
+        
+        # Delete all existing associations
+        # instance.user_company_assoc.all().delete()
+        
+        if not company_ids:
+            return
+        
+        # Fresh insert
+        UserCompanyAssoc.objects.bulk_create([
+            UserCompanyAssoc(user=instance, company_id=int(cid), created_by=instance)
+            for cid in company_ids
+        ])
+
+        
+       
     """
     def destroy(self, request, *args, **kwargs):
         # 1. Look up object inside default active manager scope

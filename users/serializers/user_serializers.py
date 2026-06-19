@@ -52,31 +52,35 @@ class RolePermissionSerializer(serializers.ModelSerializer):
             "module": custom_module_data
         }
 
-class RoleBasicSerializer(serializers.ModelSerializer):
-    permissions = RolePermissionSerializer(source='role_permissions', many=True, read_only=True)
-    class Meta:
-        model = Role
-        fields = ['id', 'name', 'code', 'permissions']
-        read_only_fields = fields
-
-
 class UserSerializer(serializers.ModelSerializer):
     role_name = serializers.CharField(source='role.name', read_only=True)
     role_code = serializers.CharField(source='role.code', read_only=True)
-
-
-    # Nested user data (read-only)
-    role = RoleBasicSerializer(read_only=True)
+    customers = serializers.SerializerMethodField()
     class Meta:
         model = User
         fields = ('id', 'email', 'username', 'first_name', 'last_name', 'profile_pic',
-                  'bio', 'role', 'role_name', 'role_code', 'is_active', 'created_at')
+                  'bio', 'role', 'role_name', 'role_code', 'is_active', 'created_at','customers')
         read_only_fields = ('id', 'created_at')
 
     def to_representation(self, instance):
-        # Remove role field id if not admin? Keep as is.
         rep = super().to_representation(instance)
         return rep
+    
+    def get_customers(self, obj):
+        grouped = {}
+        for assoc in obj.user_company_assoc.all():
+            company = assoc.company
+            customer = company.customer
+            entry = grouped.setdefault(customer.id, {
+                "customer_id": customer.id,
+                "customer_name": customer.customer_name,
+                "companies": [],
+            })
+            entry["companies"].append({
+                "company_id": company.id,
+                "company_name": company.company_name,
+            })
+        return list(grouped.values())
 
 class UserCreateSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
