@@ -1,4 +1,4 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions,status,serializers as drf_serializers
 from users.models import RolePermission
 from users.serializers import RolePermissionSerializer,RolePermissionCreateUpdateSerializer,RolePermissionListSerializer
 from core.permissions import HasModulePermission
@@ -8,8 +8,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from rest_framework.response import Response
-from rest_framework import status, permissions
-from drf_spectacular.utils import OpenApiParameter, extend_schema
+from drf_spectacular.utils import OpenApiParameter, extend_schema, inline_serializer, OpenApiExample
 from users.serializers import ModuleActionDropdownSerializer
 from users.models import ModuleActionAssoc,Role
 
@@ -194,7 +193,27 @@ class RolePermissionDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 
-
+@extend_schema(
+    tags=['Roles Management'],
+    request=inline_serializer(
+        name='BulkRolePermissionRequest',
+        fields={
+            'module_action_assoc': drf_serializers.ListField(
+                child=drf_serializers.IntegerField(min_value=1),
+                help_text='List of ModuleActionAssoc IDs to assign to this role.',
+            )
+        }
+    ),
+    examples=[
+        OpenApiExample(
+            name='Assign permissions',
+            value={'module_action_assoc': [1, 2, 3]},
+            request_only=True,
+        )
+    ],
+    summary='Bulk assign permissions to a role',
+    description='Replaces all existing permissions for the role with the provided list.',
+)
 class BulkRolePermissionView(APIView):
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
     module_code = 'user_roles'
