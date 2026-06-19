@@ -28,17 +28,19 @@ class HasModulePermission(BasePermission):
         # print(f"Action: {action_code}")
 
         if not module_code or not action_code:
-            print("Decision: DENIED (Module or Action code missing)")
+            #print("Decision: DENIED (Module or Action code missing)")
             return False
 
         # Check if role permission exists
         has_perm = RolePermission.objects.filter(
             role=request.user.role,
-            module__code=module_code,
-            action__code=action_code
+            module_action_assoc__module__code=module_code,
+            module_action_assoc__action__code=action_code
+            # module__code=module_code,
+            # action__code=action_code
         ).exists()
         
-        print(f"Decision: {'GRANTED' if has_perm else 'DENIED'}")
+        #print(f"Decision: {'GRANTED' if has_perm else 'DENIED'}")
         return has_perm
 
 class IsAuthorOrAdmin(BasePermission):
