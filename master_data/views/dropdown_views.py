@@ -7,14 +7,15 @@ from master_data.models.country import Country
 from master_data.models.customer import Customer
 from master_data.models.equipment import Equipment
 from master_data.models.state import State
+from master_data.models.transport_mode import TransportMode
 from master_data.serializers.dropdown_serializers import (
     CountryDropdownSerializer,
     CustomerDropdownSerializer,
     EquipmentDropdownSerializer,
     StateDropdownSerializer,
-    CustomerDropdownSerializer
+    TransportModeDropdownSerializer,
 )
-from master_data.models import Customer,Company
+
 
 @extend_schema(
     parameters=[
@@ -135,7 +136,6 @@ class EquipmentDropdownView(generics.ListAPIView):
             location=OpenApiParameter.QUERY,
         ),
     ],
-    
     responses={200: CustomerDropdownSerializer(many=True)},
     tags=["Dropdown lists"],
     description="Dropdown list of active customers.",
@@ -147,8 +147,48 @@ class CustomerDropdownView(generics.ListAPIView):
     pagination_class = None
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
 
-    module_code = "companies"
+    module_code = "customers"
     action_code = "view"
-    
-    queryset = Customer.objects.filter(deleted_at__isnull=True, status=True).order_by('customer_name')
 
+    def get_queryset(self):
+        queryset = Customer.objects.filter(status=True)
+        customer_name = self.request.query_params.get("customer_name", "").strip()
+
+        if customer_name:
+            queryset = queryset.filter(customer_name__icontains=customer_name)
+
+        return queryset.order_by("customer_name")
+
+
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="search",
+            description="Optional case-insensitive search by transport mode code or name.",
+            required=False,
+            type=str,
+            location=OpenApiParameter.QUERY,
+        ),
+    ],
+    responses={200: TransportModeDropdownSerializer(many=True)},
+    tags=["Dropdown lists"],
+    description="Dropdown list of active transport modes.",
+    summary="Transport Mode Dropdown",
+    operation_id="v1_transport_mode_list_dropdown",
+)
+class TransportModeDropdownView(generics.ListAPIView):
+    serializer_class = TransportModeDropdownSerializer
+    pagination_class = None
+    permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+
+    module_code = "transport_modes"
+    action_code = "view"
+
+    def get_queryset(self):
+        queryset = TransportMode.objects.filter(status=True)
+        search = self.request.query_params.get("search", "").strip()
+
+        if search:
+            queryset = queryset.filter(Q(code__icontains=search) | Q(name__icontains=search))
+
+        return queryset.order_by("name")
