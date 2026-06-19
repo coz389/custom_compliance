@@ -4,10 +4,12 @@ from rest_framework import generics, permissions
 
 from core.permissions import HasModulePermission
 from master_data.models.country import Country
+from master_data.models.customer import Customer
 from master_data.models.equipment import Equipment
 from master_data.models.state import State
 from master_data.serializers.dropdown_serializers import (
     CountryDropdownSerializer,
+    CustomerDropdownSerializer,
     EquipmentDropdownSerializer,
     StateDropdownSerializer,
     CustomerDropdownSerializer
@@ -15,6 +17,15 @@ from master_data.serializers.dropdown_serializers import (
 from master_data.models import Customer,Company
 
 @extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="country_name",
+            description="Optional case-insensitive country name search.",
+            required=False,
+            type=str,
+            location=OpenApiParameter.QUERY,
+        ),
+    ],
     responses={200: CountryDropdownSerializer(many=True)},
     tags=["Dropdown lists"],
     description="Dropdown list of countries.",
@@ -22,13 +33,21 @@ from master_data.models import Customer,Company
     operation_id="v1_country_list",
 )
 class CountryDropdownView(generics.ListAPIView):
-    queryset = Country.objects.all().order_by("country_name")
     serializer_class = CountryDropdownSerializer
     pagination_class = None
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
 
     module_code = "countries"
     action_code = "view"
+
+    def get_queryset(self):
+        queryset = Country.objects.all()
+        country_name = self.request.query_params.get("country_name", "").strip()
+
+        if country_name:
+            queryset = queryset.filter(country_name__icontains=country_name)
+
+        return queryset.order_by("country_name")
 
 
 @extend_schema(
@@ -107,11 +126,21 @@ class EquipmentDropdownView(generics.ListAPIView):
 
 
 @extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="customer_name",
+            description="Optional case-insensitive customer name search.",
+            required=False,
+            type=str,
+            location=OpenApiParameter.QUERY,
+        ),
+    ],
+    
     responses={200: CustomerDropdownSerializer(many=True)},
     tags=["Dropdown lists"],
-    description="Dropdown list of customer & companies.",
-    summary="Customer & Company Dropdown",
-    operation_id="v1_customer_company_list",
+    description="Dropdown list of active customers.",
+    summary="Customer Dropdown",
+    operation_id="v1_customer_list_dropdown",
 )
 class CustomerDropdownView(generics.ListAPIView):
     serializer_class = CustomerDropdownSerializer

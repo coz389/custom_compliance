@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from master_data.models.country import Country
+from master_data.models.customer import Customer
 from master_data.models.equipment import Equipment
 from master_data.models.state import State
 from master_data.models import Customer,Company
