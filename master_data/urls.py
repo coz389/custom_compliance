@@ -9,7 +9,9 @@ from master_data.views import (
     CustomerCreateView, CustomerDetailView, CustomerListView, CustomerDropdownView,
     CompanyCreateView, CompanyDetailView, CompanyListView,
     CustomerDocAssocCreateView, CustomerDocAssocDetailView, CustomerDocAssocListView,
-    DocumentTypeListView,DocumentTypeCreateView,DocumentTypeDetailView,DocumentTypeDropdownView
+    DocumentTypeListView,DocumentTypeCreateView,DocumentTypeDetailView,DocumentTypeDropdownView,
+    TransportModeDropdownView, TransportModeListView,
+    CarrierCreateView, CarrierDetailView, CarrierListView,
 )
 
 urlpatterns = [
@@ -60,5 +62,13 @@ urlpatterns = [
     path('document-types', DocumentTypeListView.as_view(), name='document_type_list_filter'),
     path('document-types/add', DocumentTypeCreateView.as_view(), name='document_type_create'),
     path('document-types/<int:pk>', DocumentTypeDetailView.as_view(), name='document_type_detail'),
+    # Transport Modes
+    path('transport-modes', TransportModeListView.as_view(), name='transport_mode_list_filter'),
+    # path('transport-modes/list', TransportModeDropdownView.as_view(), name='transport_mode_list'),
+    # Carriers
+    path('carriers', CarrierListView.as_view(), name='carrier_list_filter'),
+    path('carriers/add', CarrierCreateView.as_view(), name='carrier_create'),
+    path('carriers/<int:pk>', CarrierDetailView.as_view(), name='carrier_detail'),
+
 ]
 

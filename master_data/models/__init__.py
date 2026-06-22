@@ -11,6 +11,7 @@ from .customer import Customer
 from .company import Company
 from .customer_doc_assoc import CustomerDocAssoc
 from .transport_mode import TransportMode
+from .carrier import Carrier
 
 __all__=[
     'Status',
@@ -26,4 +27,5 @@ __all__=[
     "Company",
     "CustomerDocAssoc",
     'TransportMode',
+    "Carrier",
 ]

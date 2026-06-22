@@ -12,10 +12,11 @@ from master_data.serializers.dropdown_serializers import (
     CustomerDropdownSerializer,
     EquipmentDropdownSerializer,
     StateDropdownSerializer,
-    CustomerDropdownSerializer
+    TransportModeDropdownSerializer,
 )
 from master_data.serializers import TransportModeBasicSerializer
 from master_data.models import Customer,Company,TransportMode
+
 
 @extend_schema(
     parameters=[
@@ -136,7 +137,6 @@ class EquipmentDropdownView(generics.ListAPIView):
             location=OpenApiParameter.QUERY,
         ),
     ],
-    
     responses={200: CustomerDropdownSerializer(many=True)},
     tags=["Dropdown lists"],
     description="Dropdown list of active customers.",
@@ -148,10 +148,8 @@ class CustomerDropdownView(generics.ListAPIView):
     pagination_class = None
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
 
-    module_code = "companies"
+    module_code = "customers"
     action_code = "view"
-    
-    queryset = Customer.objects.filter(deleted_at__isnull=True, status=True).order_by('customer_name')
 
 
 @extend_schema(

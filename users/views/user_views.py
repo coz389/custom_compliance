@@ -4,6 +4,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from yaml import serializer
+from core.pagination import StandardResultsSetPagination
 from users.serializers import UserSerializer, UserCreateSerializer,UserListRequestSerializer,UserUpdateSerializer
 from core.permissions import HasModulePermission
 from rest_framework.views import APIView
@@ -36,7 +37,7 @@ class UserListView(APIView):
     module_code = 'user_management'
     action_code = 'view'  # default to view, will adjust in check_permissions
 
-    pagination_class = PageNumberPagination 
+    pagination_class = StandardResultsSetPagination 
     @extend_schema(
         request=UserListRequestSerializer,
         responses={200: UserSerializer(many=True)},

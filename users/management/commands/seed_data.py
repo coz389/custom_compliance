@@ -56,6 +56,7 @@ class Command(BaseCommand):
             {'name': 'Package Management', 'code': 'package_management', 'icon': 'archive', 'order': 20,'created_by':admin_user,'created_at':timezone.now()},
             {'name': 'Company Management', 'code': 'companies', 'icon': 'archive', 'order': 21,'created_by':admin_user,'created_at':timezone.now()},
             {'name': 'Customer Document Associations', 'code': 'customer_doc_assoc', 'icon': 'archive', 'order': 22,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Carriers', 'code': 'carriers', 'icon': 'truck', 'order': 23,'created_by':admin_user,'created_at':timezone.now()},
         ]
         modules = {}
         for mod in modules_data:
@@ -119,6 +120,7 @@ class Command(BaseCommand):
             'package_management': ['view', 'add', 'update', 'delete'],
             'companies': ['view', 'add', 'update', 'delete'],
             'customer_doc_assoc': ['view', 'add', 'update', 'delete'],
+            'carriers': ['view', 'add', 'update', 'delete'],
         }
         module_action_assoc_map = {}
         for module_code, action_codes in module_action_map.items():
@@ -171,6 +173,7 @@ class Command(BaseCommand):
                 'package_management': ['view', 'add', 'update', 'delete'],
                 'companies': ['view', 'add', 'update', 'delete'],
                 'customer_doc_assoc': ['view', 'add', 'update', 'delete'],
+                'carriers': ['view', 'add', 'update', 'delete'],
             },
             'port_admin': {
                 'dashboard': ['view', 'add', 'update', 'export', 'import', 'download'],
