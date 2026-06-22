@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from users.models import User
-from master_data.models import DocumentType
+from master_data.models import DocumentType, TransportMode
 from rest_framework.validators import UniqueValidator
 
 
@@ -18,6 +18,24 @@ class UserBasicSerializer(serializers.ModelSerializer):
 
 class DocumentTypeSerializer(serializers.ModelSerializer):
     transport_mode_name = serializers.CharField(source='transport_mode.name', read_only=True)
+    transport_mode = serializers.PrimaryKeyRelatedField(queryset=TransportMode.objects.all())
+
+    def validate_file_formats(self, value):
+        if not isinstance(value, list):
+            raise serializers.ValidationError("file_formats must be a list. e.g: [\"pdf\", \"xls\", \"csv\"]")
+
+        cleaned = [fmt.strip().lower() for fmt in value if isinstance(fmt, str) and fmt.strip()]
+
+        if not cleaned:
+            raise serializers.ValidationError("At least one file format is required.")
+
+        return cleaned
+
+    def validate_transport_mode(self, value):
+        if not TransportMode.objects.filter(pk=value.pk, status=True).exists():
+            raise serializers.ValidationError("Selected transport mode does not exist or is inactive.")
+        return value
+
     def validate_name(self, value):
         if not value or not value.strip():
             raise serializers.ValidationError("Document Type name cannot be empty.")
@@ -49,7 +67,7 @@ class DocumentTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = DocumentType
         # fields = '__all__'
-        fields = ['id', 'name','transport_mode','transport_mode_name','file_formats', 'description', 'status','created_by','created_at', 'updated_by', 'updated_at']
+        fields = ['id', 'name', 'transport_mode', 'transport_mode_name', 'file_formats', 'description', 'status', 'created_by', 'created_at', 'updated_by', 'updated_at']
     
     def get_created_by_name(self, obj):
         if obj.created_by:

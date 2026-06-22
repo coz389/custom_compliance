@@ -14,7 +14,8 @@ from master_data.serializers.dropdown_serializers import (
     StateDropdownSerializer,
     CustomerDropdownSerializer
 )
-from master_data.models import Customer,Company
+from master_data.serializers import TransportModeBasicSerializer
+from master_data.models import Customer,Company,TransportMode
 
 @extend_schema(
     parameters=[
@@ -151,4 +152,23 @@ class CustomerDropdownView(generics.ListAPIView):
     action_code = "view"
     
     queryset = Customer.objects.filter(deleted_at__isnull=True, status=True).order_by('customer_name')
+
+
+@extend_schema(
+    responses={200: TransportModeBasicSerializer(many=False)},
+    tags=["Dropdown lists"],
+    description="Dropdown list of active transport modes.",
+    summary="Transport mode Dropdown",
+    operation_id="v1_transport_mode_list_dropdown",
+)
+class TransportModeDropdownView(generics.ListAPIView):
+    serializer_class = TransportModeBasicSerializer
+    pagination_class = None
+    permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+
+    module_code = "transport_modes"
+    action_code = "view"
+    
+    queryset = TransportMode.objects.filter(status=True).order_by('name')
+
 

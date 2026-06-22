@@ -28,15 +28,15 @@ class DocumentTypeFilter(django_filters.FilterSet):
 
 
 
-class StatusListView(generics.GenericAPIView):
+class DocumentTypeListView(generics.GenericAPIView):
     """
-    List all status with filtering using POST method
+    List all document type with filtering using POST method
     """
-    queryset = Status.objects.select_related('created_by', 'updated_by').filter(status=True)
-    serializer_class = StatusSerializer
+    queryset = DocumentType.objects.select_related('created_by', 'updated_by').filter(status=True)
+    serializer_class = DocumentTypeSerializer
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
-    module_code = 'status'
-
+    module_code = 'document_type'
+    print("Document Type List API calling...")
     def get_action_code(self):
         return 'view'
 
@@ -45,23 +45,23 @@ class StatusListView(generics.GenericAPIView):
         super().check_permissions(request)
 
     @extend_schema(
-        request=StatusListRequestSerializer, # Request body schema for filtering and pagination to show in Swagger
-        responses={200: StatusSerializer(many=True)},
-        tags=['Status Management'], # Grouping in Swagger UI
-        description="List all active status with optional filtering, sorting, and pagination. Use POST method to send filter criteria in the request body.", # Detailed description for Swagger UI
-        summary="List Status (with filtering)", # Swagger UI heading for this endpoint
-        operation_id="v1_status_list_post" # URL fragment for this operation in Swagger UI
+        request=DocumentTypeListRequestSerializer, # Request body schema for filtering and pagination to show in Swagger
+        responses={200: DocumentTypeSerializer(many=True)},
+        tags=['Document Management'], # Grouping in Swagger UI
+        description="List all active Document Types with optional filtering, sorting, and pagination. Use POST method to send filter criteria in the request body.", # Detailed description for Swagger UI
+        summary="List Document Type (with filtering)", # Swagger UI heading for this endpoint
+        operation_id="v1_document_type_list_post" # URL fragment for this operation in Swagger UI
     )
 
     def post(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        
+        print("Document Type List API calling...")
         # Clean request data: strip spaces from keys and values
         clean_data = {k.strip(): (v.strip() if isinstance(v, str) else v) 
                       for k, v in request.data.items()}
         
         # 1. Apply filters
-        filterset = StatusFilter(clean_data, queryset=queryset)
+        filterset = DocumentTypeFilter(clean_data, queryset=queryset)
         if filterset.is_valid():
             queryset = filterset.qs
         else:
@@ -72,7 +72,7 @@ class StatusListView(generics.GenericAPIView):
         sort_order = clean_data.get('sort_order', 'desc') # default to newest first
         
         # Validate sort_column exists in model
-        allowed_columns = [f.name for f in Status._meta.fields]
+        allowed_columns = [f.name for f in DocumentType._meta.fields]
         if sort_column in allowed_columns:
             if sort_order.lower() == 'desc':
                 queryset = queryset.order_by(f'-{sort_column}')
@@ -100,52 +100,55 @@ class StatusListView(generics.GenericAPIView):
         paginator.page_size = page_size
         
         # We need to trick DRF paginator to read page from our clean_data instead of query_params
-        # Or we can manually paginate
         try:
-            # Standard paginator uses query_params, so we override the request's query_params temporarily
-            # But a cleaner way is to set the page number manually if possible.
-            # For simplicity, let's inject into request.query_params for the paginator to find it
             request.query_params._mutable = True
             request.query_params['page'] = page_num
             request.query_params['page_size'] = page_size
             request.query_params._mutable = False
-            
+
             page = paginator.paginate_queryset(queryset, request, view=self)
-            
+
             if page is not None:
                 serializer = self.get_serializer(page, many=True)
                 return paginator.get_paginated_response(serializer.data)
         except Exception as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            error_msg = str(e)
+            if 'Invalid page' in error_msg or 'invalid page' in error_msg.lower():
+                return Response({
+                    "status": 200,
+                    "message": "Data not found",
+                    "results": {"detail": "No data found"}
+                }, status=status.HTTP_200_OK)
+            return Response({"detail": error_msg}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
 
-@extend_schema(tags=['Status Management']) 
-class StatusCreateView(generics.CreateAPIView):
+@extend_schema(tags=['Document Management']) 
+class DocumentTypeCreateView(generics.CreateAPIView):
     """
-    Create a new status (admin only)
+    Create a new Document Type (admin only)
     """
-    queryset = Status.objects.all()
-    serializer_class = StatusSerializer
+    queryset = DocumentType.objects.all()
+    serializer_class = DocumentTypeSerializer
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
-    module_code = 'status'
+    module_code = 'document_type'
     action_code = 'add'
 
     def check_permissions(self, request):
         # Explicitly set action to 'add' for creation
         super().check_permissions(request)
 
-@extend_schema(tags=['Status Management']) 
-class StatusDetailView(generics.RetrieveUpdateDestroyAPIView):
+@extend_schema(tags=['Document Management']) 
+class DocumentTypeDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     Retrieve, update or delete a specific status (admin only)
     """
-    queryset = Status.objects.all()
-    serializer_class = StatusSerializer
+    queryset = DocumentType.objects.all()
+    serializer_class = DocumentTypeSerializer
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
-    module_code = 'status'
+    module_code = 'document_type'
     action_code = 'view'  # default to view, will adjust in check_permissions
 
     def get_action_code(self):
@@ -173,7 +176,7 @@ class StatusDetailView(generics.RetrieveUpdateDestroyAPIView):
         
         # CRITICAL FIX: Base manager dynamically targeted bypassing soft-delete filtration block
         # explicit backend reload executing base manager
-        instance = Status.all_objects.get(pk=instance.pk)
+        instance = DocumentType.all_objects.get(pk=instance.pk)
 
         # 5. Pipeline Serialization mapping out exact object state representation
         serializer = self.get_serializer(instance)
@@ -184,3 +187,20 @@ class StatusDetailView(generics.RetrieveUpdateDestroyAPIView):
             "data": serializer.data
         }, status=status.HTTP_200_OK)
 
+
+@extend_schema(
+    responses={200: DocumentTypeSerializer(many=False)},
+    tags=["Dropdown lists"],
+    description="Dropdown list of active document types.",
+    summary="Document type Dropdown",
+    operation_id="v1_document_type_list_dropdown",
+)
+class DocumentTypeDropdownView(generics.ListAPIView):
+    serializer_class = DocumentTypeSerializer
+    pagination_class = None
+    permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+
+    module_code = "document_type"
+    action_code = "view"
+    
+    queryset = DocumentType.objects.filter(status=True).order_by('name')

@@ -9,6 +9,7 @@ from .seaport_serializers import SeaportListRequestSerializer, SeaportSerializer
 from .customer_serializers import CustomerSerializer, CustomerListRequestSerializer
 from .company_serializers import CompanySerializer, CompanyListRequestSerializer
 from .customer_doc_assoc_serializers import CustomerDocAssocSerializer, CustomerDocAssocListSerializer
+from .transport_mode_serializers import TransportModeBasicSerializer
 
 
 __all__=[
@@ -23,4 +24,5 @@ __all__=[
     'CustomerSerializer','CustomerListRequestSerializer',
     'CompanySerializer','CompanyListRequestSerializer',
     'CustomerDocAssocSerializer', 'CustomerDocAssocListSerializer',
+    'TransportModeBasicSerializer',
 ]

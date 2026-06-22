@@ -8,3 +8,5 @@ class TransportModeBasicSerializer(serializers.ModelSerializer):
         model = TransportMode
         fields = ["id", "code", "name"]
         read_only_fields = fields
+
+
