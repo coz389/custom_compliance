@@ -8,6 +8,7 @@ from .seaport_views import SeaportCreateView, SeaportDetailView, SeaportListView
 from .customer_views import CustomerCreateView, CustomerDetailView, CustomerListView
 from .company_views import CompanyCreateView, CompanyDetailView, CompanyListView
 from .customer_doc_assoc_views import CustomerDocAssocCreateView, CustomerDocAssocDetailView, CustomerDocAssocListView
+from .document_type_view import DocumentTypeListView,DocumentTypeCreateView,DocumentTypeDetailView,DocumentTypeDropdownView
 from .transport_mode_view import TransportModeListView
 from .carrier_views import CarrierCreateView, CarrierDetailView, CarrierListView
 
@@ -31,6 +32,8 @@ __all__=[
     'CompanyCreateView','CompanyDetailView','CompanyListView',
     #Customer Document Association Views
     'CustomerDocAssocCreateView','CustomerDocAssocDetailView','CustomerDocAssocListView',
+    #Document Management
+    'DocumentTypeListView','DocumentTypeCreateView','DocumentTypeDetailView','DocumentTypeDropdownView',
     #Transport Mode Views
     'TransportModeListView',
     #Carrier Views
