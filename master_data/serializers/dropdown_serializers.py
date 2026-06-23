@@ -1,10 +1,6 @@
 from rest_framework import serializers
 
-from master_data.models.country import Country
-from master_data.models.customer import Customer
-from master_data.models.equipment import Equipment
-from master_data.models.state import State
-from master_data.models.transport_mode import TransportMode
+from master_data.models import Country, State, Equipment, Customer, TransportMode
 
 
 class CountryDropdownSerializer(serializers.ModelSerializer):
@@ -48,6 +44,7 @@ class CustomerDropdownSerializer(serializers.ModelSerializer):
         model = Customer
         fields = ["id", "customer_name", "customer_code"]
         read_only_fields = fields
+
 class CustomerCompanyDropdownSerializer(serializers.ModelSerializer):
     companies = serializers.SerializerMethodField()
     class Meta:
