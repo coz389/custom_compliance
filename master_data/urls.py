@@ -11,6 +11,8 @@ from master_data.views import (
     CustomerDocAssocCreateView, CustomerDocAssocDetailView, CustomerDocAssocListView,
     TransportModeDropdownView, TransportModeListView,
     CarrierCreateView, CarrierDetailView, CarrierListView,
+    CustomerLspAssocCreateView, CustomerLspAssocDetailView, CustomerLspAssocListView,
+    CarrierContactCreateView, CarrierContactDetailView, CarrierContactListView
 )
 
 urlpatterns = [
@@ -62,6 +64,13 @@ urlpatterns = [
     path('carriers', CarrierListView.as_view(), name='carrier_list_filter'),
     path('carriers/add', CarrierCreateView.as_view(), name='carrier_create'),
     path('carriers/<int:pk>', CarrierDetailView.as_view(), name='carrier_detail'),
-
+    # Customer LSP Associations
+    path('customer-lsp', CustomerLspAssocListView.as_view(), name='customer_lsp_assoc_list'),
+    path('customer-lsp/add', CustomerLspAssocCreateView.as_view(), name='customer_lsp_assoc_create'),
+    path('customer-lsp/<int:pk>', CustomerLspAssocDetailView.as_view(), name='customer_lsp_assoc_detail'),
+    # Carrier Contacts
+    path('carrier-contacts', CarrierContactListView.as_view(), name='carrier_contact_list'),
+    path('carrier-contacts/add', CarrierContactCreateView.as_view(), name='carrier_contact_create'),
+    path('carrier-contacts/<int:pk>', CarrierContactDetailView.as_view(), name='carrier_contact_detail'),
 ]
 

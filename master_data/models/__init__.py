@@ -11,6 +11,8 @@ from .customer import Customer
 from .company import Company
 from .customer_doc_assoc import CustomerDocAssoc
 from .carrier import Carrier
+from .customer_lsp_assoc import CustomerLspAssoc
+from .carrier_contact import CarrierContact
 
 __all__=[
     'Status',
@@ -26,4 +28,6 @@ __all__=[
     "Company",
     "CustomerDocAssoc",
     "Carrier",
+    "CustomerLspAssoc",
+    "CarrierContact",
 ]
