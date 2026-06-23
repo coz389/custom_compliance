@@ -1,14 +1,15 @@
 from django.urls import path
 from master_data.views import (
     StatusListView,StatusDetailView,StatusCreateView, CarrierTypeListView,CarrierTypeCreateView,CarrierTypeDetailView,
-    CountryDropdownView, StateDropdownView,CityCreateView, CityDetailView, CityListView,
+    CountryDropdownView, StateDropdownView,CityCreateView, CityDetailView, CityListView,TransportModeDropdownView,
     ContainerCreateView, ContainerDetailView, ContainerListView,
     EquipmentCreateView, EquipmentDetailView, EquipmentListView,
     EquipmentDropdownView,
     SeaportCreateView, SeaportDetailView, SeaportListView,
-    CustomerCreateView, CustomerDetailView, CustomerListView, CustomerDropdownView,
+    CustomerCreateView, CustomerDetailView, CustomerListView, CustomerDropdownView,CustomerCompaniesDropdownView,
     CompanyCreateView, CompanyDetailView, CompanyListView,
     CustomerDocAssocCreateView, CustomerDocAssocDetailView, CustomerDocAssocListView,
+    DocumentTypeListView,DocumentTypeCreateView,DocumentTypeDetailView,DocumentTypeDropdownView,
     TransportModeDropdownView, TransportModeListView,
     CarrierCreateView, CarrierDetailView, CarrierListView,
     CustomerLspAssocCreateView, CustomerLspAssocDetailView, CustomerLspAssocListView,
@@ -52,14 +53,20 @@ urlpatterns = [
     path('companies', CompanyListView.as_view(), name='company_list_filter'),
     path('companies/add', CompanyCreateView.as_view(), name='company_create'),
     path('companies/<int:pk>', CompanyDetailView.as_view(), name='company_detail'),
-    path('customer-companies', CustomerDropdownView.as_view(), name='customer_company_list'),
+    path('customer-companies/dropdown', CustomerCompaniesDropdownView.as_view(), name='customer_company_list'),
     # Customer Document Associations
     path('customer-document', CustomerDocAssocListView.as_view(), name='customer_doc_assoc_list'),
     path('customer-document/add', CustomerDocAssocCreateView.as_view(), name='customer_doc_assoc_create'),
     path('customer-document/<int:pk>', CustomerDocAssocDetailView.as_view(), name='customer_doc_assoc_detail'),
+    #Document Management
+    path('transport-modes/dropdown', TransportModeDropdownView.as_view(), name='transport_mode_list_filter'),
+    path('document-types/dropdown', DocumentTypeDropdownView.as_view(), name='document_type_list_filter'),
+    path('document-types', DocumentTypeListView.as_view(), name='document_type_list_filter'),
+    path('document-types/add', DocumentTypeCreateView.as_view(), name='document_type_create'),
+    path('document-types/<int:pk>', DocumentTypeDetailView.as_view(), name='document_type_detail'),
     # Transport Modes
     path('transport-modes', TransportModeListView.as_view(), name='transport_mode_list_filter'),
-    path('transport-modes/list', TransportModeDropdownView.as_view(), name='transport_mode_list'),
+    # path('transport-modes/list', TransportModeDropdownView.as_view(), name='transport_mode_list'),
     # Carriers
     path('carriers', CarrierListView.as_view(), name='carrier_list_filter'),
     path('carriers/add', CarrierCreateView.as_view(), name='carrier_create'),

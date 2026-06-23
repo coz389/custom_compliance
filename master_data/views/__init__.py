@@ -3,11 +3,12 @@ from .carrier_type_view import CarrierTypeListView, CarrierTypeCreateView,Carrie
 from .city_views import CityCreateView, CityDetailView, CityListView
 from .container_views import ContainerCreateView, ContainerDetailView, ContainerListView
 from .equipment_views import EquipmentCreateView, EquipmentDetailView, EquipmentListView
-from .dropdown_views import CountryDropdownView, EquipmentDropdownView, StateDropdownView, CustomerDropdownView, TransportModeDropdownView
+from .dropdown_views import CountryDropdownView, EquipmentDropdownView, StateDropdownView, CustomerDropdownView, TransportModeDropdownView,CustomerCompaniesDropdownView
 from .seaport_views import SeaportCreateView, SeaportDetailView, SeaportListView
 from .customer_views import CustomerCreateView, CustomerDetailView, CustomerListView
 from .company_views import CompanyCreateView, CompanyDetailView, CompanyListView
 from .customer_doc_assoc_views import CustomerDocAssocCreateView, CustomerDocAssocDetailView, CustomerDocAssocListView
+from .document_type_view import DocumentTypeListView,DocumentTypeCreateView,DocumentTypeDetailView,DocumentTypeDropdownView
 from .transport_mode_view import TransportModeListView
 from .carrier_views import CarrierCreateView, CarrierDetailView, CarrierListView
 from .customer_lsp_assoc_views import CustomerLspAssocCreateView, CustomerLspAssocDetailView, CustomerLspAssocListView
@@ -24,7 +25,7 @@ __all__=[
     #Container Views
     'ContainerCreateView','ContainerDetailView','ContainerListView',
     #Equipment Views
-    'EquipmentCreateView','EquipmentDetailView','EquipmentListView',
+    'EquipmentCreateView','EquipmentDetailView','EquipmentListView','CustomerCompaniesDropdownView',
     #Seaport Views
     'SeaportCreateView','SeaportDetailView','SeaportListView',
     #Customer Views
@@ -33,6 +34,8 @@ __all__=[
     'CompanyCreateView','CompanyDetailView','CompanyListView',
     #Customer Document Association Views
     'CustomerDocAssocCreateView','CustomerDocAssocDetailView','CustomerDocAssocListView',
+    #Document Management
+    'DocumentTypeListView','DocumentTypeCreateView','DocumentTypeDetailView','DocumentTypeDropdownView',
     #Transport Mode Views
     'TransportModeListView',
     #Carrier Views

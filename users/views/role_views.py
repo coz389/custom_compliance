@@ -2,7 +2,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from users.models import Role,User
-from users.serializers import RoleSerializer,RoleListRequestSerializer
+from users.serializers import RoleSerializer,RoleListRequestSerializer,RoleDetailsSerializer
 # from users.serializers import RoleSerializer
 from core.permissions import HasModulePermission
 import django_filters
@@ -149,6 +149,11 @@ class RoleDetailView(generics.RetrieveUpdateDestroyAPIView):
     module_code = 'user_roles'
     action_code = 'view'  # default to view, will adjust in check_permissions
 
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return RoleDetailsSerializer
+        return RoleSerializer
+
     def get_action_code(self):
         if self.request.method == 'GET':
             return 'view'
@@ -162,7 +167,7 @@ class RoleDetailView(generics.RetrieveUpdateDestroyAPIView):
         self.action_code = self.get_action_code()
         super().check_permissions(request)
 
-    def destroy(self, request, *args, **kwargs) -> Response:
+    def destroy(self, request, *args, **kwargs):
         # 1. Look up object inside default active manager scope
         instance = self.get_object()
         
