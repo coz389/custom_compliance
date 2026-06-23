@@ -12,9 +12,8 @@ from master_data.serializers.dropdown_serializers import (
     CustomerDropdownSerializer,
     EquipmentDropdownSerializer,
     StateDropdownSerializer,
-    TransportModeDropdownSerializer,
 )
-from master_data.serializers import TransportModeBasicSerializer
+from master_data.serializers import TransportModeBasicSerializer,CustomerCompanyDropdownSerializer
 from master_data.models import Customer,Company,TransportMode
 
 
@@ -150,8 +149,40 @@ class CustomerDropdownView(generics.ListAPIView):
 
     module_code = "customers"
     action_code = "view"
+    def get_queryset(self):
+        queryset = Customer.objects.filter(status=True)
+        customer_name = self.request.query_params.get("customer_name", "").strip()
+
+        if customer_name:
+            queryset = queryset.filter(customer_name__icontains=customer_name)
+
+        return queryset.order_by("customer_name")
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="customer_name",
+            description="Optional case-insensitive customer name search.",
+            required=False,
+            type=str,
+            location=OpenApiParameter.QUERY,
+        ),
+    ],
+    responses={200: CustomerCompanyDropdownSerializer(many=True)},
+    tags=["Dropdown lists"],
+    description="Dropdown list of active customers.",
+    summary="Customer Company Dropdown",
+    operation_id="v1_customer_company_list_dropdown",
+)
+class CustomerCompaniesDropdownView(generics.ListAPIView):
+    serializer_class = CustomerCompanyDropdownSerializer
+    pagination_class = None
+    permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+    module_code = "customers"
+    action_code = "view"
+    queryset = Customer.objects.filter(deleted_at__isnull=True, status=True).order_by('customer_name')
+    
 @extend_schema(
     responses={200: TransportModeBasicSerializer(many=False)},
     tags=["Dropdown lists"],
@@ -167,6 +198,14 @@ class TransportModeDropdownView(generics.ListAPIView):
     module_code = "transport_modes"
     action_code = "view"
     
-    queryset = TransportMode.objects.filter(status=True).order_by('name')
+    # queryset = TransportMode.objects.filter(status=True).order_by('name')
+    def get_queryset(self):
+        queryset = TransportMode.objects.filter(status=True)
+        search = self.request.query_params.get("search", "").strip()
+ 
+        if search:
+            queryset = queryset.filter(Q(code__icontains=search) | Q(name__icontains=search))
+ 
+        return queryset.order_by("name")
 
 
