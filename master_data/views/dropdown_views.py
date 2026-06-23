@@ -3,18 +3,15 @@ from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import generics, permissions
 
 from core.permissions import HasModulePermission
-from master_data.models.country import Country
-from master_data.models.customer import Customer
-from master_data.models.equipment import Equipment
-from master_data.models.state import State
-from master_data.serializers.dropdown_serializers import (
+from master_data.models import Country, State, Equipment, Customer, TransportMode
+from master_data.serializers import (
     CountryDropdownSerializer,
     CustomerDropdownSerializer,
     EquipmentDropdownSerializer,
     StateDropdownSerializer,
+    TransportModeBasicSerializer,
+    CustomerCompanyDropdownSerializer,
 )
-from master_data.serializers import TransportModeBasicSerializer,CustomerCompanyDropdownSerializer
-from master_data.models import Customer,Company,TransportMode
 
 
 @extend_schema(

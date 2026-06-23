@@ -11,6 +11,8 @@ from .customer_doc_assoc_views import CustomerDocAssocCreateView, CustomerDocAss
 from .document_type_view import DocumentTypeListView,DocumentTypeCreateView,DocumentTypeDetailView,DocumentTypeDropdownView
 from .transport_mode_view import TransportModeListView
 from .carrier_views import CarrierCreateView, CarrierDetailView, CarrierListView
+from .customer_lsp_assoc_views import CustomerLspAssocCreateView, CustomerLspAssocDetailView, CustomerLspAssocListView
+from .carrier_contact_views import CarrierContactCreateView, CarrierContactDetailView, CarrierContactListView
 
 __all__=[
     #Status Views
@@ -38,4 +40,8 @@ __all__=[
     'TransportModeListView',
     #Carrier Views
     'CarrierCreateView','CarrierDetailView','CarrierListView',
+    #Customer LSP Association Views
+    'CustomerLspAssocCreateView','CustomerLspAssocDetailView','CustomerLspAssocListView',
+    #Carrier Contact Views
+    'CarrierContactCreateView','CarrierContactDetailView','CarrierContactListView',
 ]
