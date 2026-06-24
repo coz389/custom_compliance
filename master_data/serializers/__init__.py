@@ -11,6 +11,8 @@ from .company_serializers import CompanySerializer, CompanyListRequestSerializer
 from .customer_doc_assoc_serializers import CustomerDocAssocSerializer, CustomerDocAssocListSerializer
 from .transport_mode_serializers import TransportModeBasicSerializer,TransportModeSerializer, TransportModeListRequestSerializer
 from .carrier_serializers import CarrierSerializer, CarrierListRequestSerializer
+from .customer_lsp_assoc_serializers import CustomerLspAssocSerializer, CustomerLspAssocListSerializer
+from .carrier_contact_serializers import CarrierContactSerializer, CarrierContactListSerializer
 
 __all__=[
     'StatusSerializer','StatusListRequestSerializer','StatusUpdateSerializer',
@@ -26,4 +28,6 @@ __all__=[
     'CustomerDocAssocSerializer', 'CustomerDocAssocListSerializer',
     'TransportModeBasicSerializer','TransportModeSerializer','TransportModeListRequestSerializer',
     'CarrierSerializer', 'CarrierListRequestSerializer',
+    'CustomerLspAssocSerializer', 'CustomerLspAssocListSerializer',
+    'CarrierContactSerializer', 'CarrierContactListSerializer',
 ]
