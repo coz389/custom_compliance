@@ -3,10 +3,9 @@ from .carrier_type_view import CarrierTypeListView, CarrierTypeCreateView,Carrie
 from .city_views import CityCreateView, CityDetailView, CityListView
 from .container_views import ContainerCreateView, ContainerDetailView, ContainerListView
 from .equipment_views import EquipmentCreateView, EquipmentDetailView, EquipmentListView
-from .dropdown_views import CountryDropdownView, EquipmentDropdownView, StateDropdownView, CustomerDropdownView, TransportModeDropdownView,CustomerCompaniesDropdownView
+from .dropdown_views import CountryDropdownView, EquipmentDropdownView, StateDropdownView, CustomerDropdownView, TransportModeDropdownView
 from .seaport_views import SeaportCreateView, SeaportDetailView, SeaportListView
 from .customer_views import CustomerCreateView, CustomerDetailView, CustomerListView
-from .company_views import CompanyCreateView, CompanyDetailView, CompanyListView
 from .customer_doc_assoc_views import CustomerDocAssocCreateView, CustomerDocAssocDetailView, CustomerDocAssocListView
 from .document_type_view import DocumentTypeListView,DocumentTypeCreateView,DocumentTypeDetailView,DocumentTypeDropdownView
 from .transport_mode_view import TransportModeListView
@@ -25,13 +24,11 @@ __all__=[
     #Container Views
     'ContainerCreateView','ContainerDetailView','ContainerListView',
     #Equipment Views
-    'EquipmentCreateView','EquipmentDetailView','EquipmentListView','CustomerCompaniesDropdownView',
+    'EquipmentCreateView','EquipmentDetailView','EquipmentListView',
     #Seaport Views
     'SeaportCreateView','SeaportDetailView','SeaportListView',
     #Customer Views
     'CustomerCreateView','CustomerDetailView','CustomerListView',
-    #Company Views
-    'CompanyCreateView','CompanyDetailView','CompanyListView',
     #Customer Document Association Views
     'CustomerDocAssocCreateView','CustomerDocAssocDetailView','CustomerDocAssocListView',
     #Document Management

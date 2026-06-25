@@ -11,8 +11,6 @@ from rest_framework.views import APIView
 from django.db.models import Q
 from drf_spectacular.utils import extend_schema,inline_serializer, OpenApiExample,extend_schema_view
 from django.db import transaction
-from users.models import UserCompanyAssoc
-from master_data.models import Company
 User = get_user_model()
 
 class UserFilter(django_filters.FilterSet):
@@ -134,7 +132,7 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
     @extend_schema(
         tags=['Users Management'],
         summary='Retrieve a user',
-        description='Get full details of a specific user including assigned companies.',
+        description='Get full details of a specific user.',
         responses={200: UserSerializer},
     )
     def get(self, request, *args, **kwargs):
@@ -142,32 +140,26 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
 
     @extend_schema(
         tags=['Users Management'],
-        summary='Update user with company assignments',
-        description='Updates user fields and replaces all existing company assignments.',
+        summary='Update user',
+        description='Updates user fields.',
         request=inline_serializer(
-            name='UserUpdateWithCompaniesRequest',
+            name='UserUpdateRequest',
             fields={
                 'first_name':   drf_serializers.CharField(required=False),
                 'last_name':    drf_serializers.CharField(required=False),
                 'email':        drf_serializers.EmailField(required=False),
                 'role':         drf_serializers.IntegerField(required=False),
                 'is_active':    drf_serializers.BooleanField(required=False),
-                'company_ids':  drf_serializers.ListField(
-                    child=drf_serializers.IntegerField(min_value=1),
-                    required=False,
-                    help_text='List of Company IDs. Replaces existing assignments.',
-                ),
             }
         ),
         examples=[
             OpenApiExample(
-                name='Update user and assign companies',
+                name='Update user',
                 value={
                     'first_name': 'Abhishek',
                     'last_name':  'Sahu',
                     'role':       1,
                     'is_active':  True,
-                    'company_ids': [1, 2, 3],
                 },
                 request_only=True,
             )
@@ -188,11 +180,6 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
                 'email':       drf_serializers.EmailField(required=False),
                 'role':        drf_serializers.IntegerField(required=False),
                 'is_active':   drf_serializers.BooleanField(required=False),
-                'company_ids': drf_serializers.ListField(
-                    child=drf_serializers.IntegerField(min_value=1),
-                    required=False,
-                    help_text='List of Company IDs. Replaces existing assignments.',
-                ),
             }
         ),
         responses={200: UserSerializer},
@@ -202,18 +189,7 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
 
     @transaction.atomic
     def perform_update(self, serializer):
-        instance = serializer.save()
-        company_ids = self.request.data.get('company_ids')
-
-        if not company_ids:
-            return
-
-        instance.user_company_assoc.all().delete()
-
-        UserCompanyAssoc.objects.bulk_create([
-            UserCompanyAssoc(user=instance, company_id=int(cid), created_by=instance)
-            for cid in company_ids
-        ])
+        serializer.save()
 
 class UserDetailView123(generics.RetrieveUpdateAPIView):#RetrieveUpdateDestroyAPIView
     """
@@ -245,22 +221,7 @@ class UserDetailView123(generics.RetrieveUpdateAPIView):#RetrieveUpdateDestroyAP
     @transaction.atomic
     def perform_update(self, serializer):
         # Get Primary table (User) Instance and Save to other table
-        instance = serializer.save()  
-        company_ids = self.request.data.get('company_ids')
-        if not company_ids:
-            return
-        
-        # Delete all existing associations
-        UserCompanyAssoc.objects.filter(user=instance).delete()
-        
-        if not company_ids:
-            return
-        
-        # Fresh insert
-        UserCompanyAssoc.objects.bulk_create([
-            UserCompanyAssoc(user=instance, company_id=int(cid), created_by=instance)
-            for cid in company_ids
-        ])
+        serializer.save()
 
         
        

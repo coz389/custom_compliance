@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from rest_framework.response import Response
-from drf_spectacular.utils import OpenApiParameter, extend_schema, inline_serializer, OpenApiExample
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view, inline_serializer, OpenApiExample
 from users.serializers import ModuleActionDropdownSerializer
 from users.models import ModuleActionAssoc,Role
 
@@ -265,13 +265,13 @@ class BulkRolePermissionView(APIView):
         serializer = RolePermissionListSerializer(created, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-@extend_schema(
+@extend_schema_view(get=extend_schema(
     responses={200: ModuleActionDropdownSerializer(many=True)},
     tags=["Dropdown lists"],
     description="Dropdown list of Module Action.",
     summary="Module Action Dropdown",
     operation_id="v1_module_action_list",
-)
+))
 class ModuleActionAssocDropdownView(generics.ListAPIView):
     queryset = ModuleActionAssoc.objects.all()
     serializer_class = ModuleActionDropdownSerializer

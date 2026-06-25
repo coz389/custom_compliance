@@ -4,59 +4,35 @@ from master_data.models import CarrierContact
 
 
 class CarrierContactSerializer(serializers.ModelSerializer):
-    carrier_name = serializers.CharField(source="carrier.carrier_name", read_only=True)
-    transport_name = serializers.CharField(
-        source="transport.name", read_only=True, allow_null=True, default=None
-    )
-    primary_transport_name = serializers.CharField(
-        source="primary_transport.name", read_only=True, allow_null=True, default=None
-    )
-    customer_name = serializers.CharField(
-        source="customer.customer_name", read_only=True, allow_null=True, default=None
-    )
-    company_name = serializers.CharField(
-        source="company.company_name", read_only=True, allow_null=True, default=None
-    )
-    country_name = serializers.CharField(
-        source="country.country_name", read_only=True, allow_null=True, default=None
-    )
-    export_country_name = serializers.CharField(
-        source="export_country.country_name",
-        read_only=True,
-        allow_null=True,
-        default=None,
-    )
-    import_country_name = serializers.CharField(
-        source="import_country.country_name",
-        read_only=True,
-        allow_null=True,
-        default=None,
-    )
-    city_name = serializers.CharField(
-        source="city.city_name", read_only=True, allow_null=True, default=None
-    )
-    created_by = serializers.SlugRelatedField(slug_field="username", read_only=True)
-    updated_by = serializers.SlugRelatedField(slug_field="username", read_only=True)
+    carrier_name = serializers.CharField(source='carrier.carrier_name', read_only=True)
+    transport_name = serializers.CharField(source='transport.name', read_only=True, allow_null=True, default=None)
+    primary_transport_name = serializers.CharField(source='primary_transport.name', read_only=True, allow_null=True, default=None)
+    customer_name = serializers.CharField(source='customer.customer_name', read_only=True, allow_null=True, default=None)
+    country_name = serializers.CharField(source='country.country_name', read_only=True, allow_null=True, default=None)
+    export_country_name = serializers.CharField(source='export_country.country_name', read_only=True, allow_null=True, default=None)
+    import_country_name = serializers.CharField(source='import_country.country_name', read_only=True, allow_null=True, default=None)
+    city_name = serializers.CharField(source='city.city_name', read_only=True, allow_null=True, default=None)
+    created_by = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    updated_by = serializers.SlugRelatedField(slug_field='username', read_only=True)
 
     class Meta:
         model = CarrierContact
         fields = [
-            "id", "status", "carrier", "carrier_name", "type", "transport", "transport_name", "shipment_type", "primary_transport",
-            "primary_transport_name", "customer", "customer_name", "company", "company_name", "country", "country_name", "emails",
-            "export_country", "export_country_name", "import_country", "import_country_name", "city", "city_name", "service_type",
-            "threshold", "auto_approve", "created_by", "created_at", "updated_by", "updated_at",
+            'id', 'status',
+            'carrier', 'carrier_name',
+            'type',
+            'transport', 'transport_name',
+            'shipment_type',
+            'primary_transport', 'primary_transport_name',
+            'customer', 'customer_name',
+            'country', 'country_name',
+            'emails',
+            'export_country', 'export_country_name',
+            'import_country', 'import_country_name',
+            'city', 'city_name',
+            'service_type', 'threshold', 'auto_approve',
+            'created_by', 'created_at', 'updated_by', 'updated_at',
         ]
-
-    def validate(self, attrs):
-        customer = attrs.get('customer', getattr(self.instance, 'customer', None))
-        company = attrs.get('company', getattr(self.instance, 'company', None))
-
-        if customer and company and company.customer_id != customer.id:
-            raise serializers.ValidationError({
-                'company': 'Selected company does not belong to the selected customer.'
-            })
-
-        return attrs
 
 
 class CarrierContactListSerializer(serializers.Serializer):
@@ -64,7 +40,6 @@ class CarrierContactListSerializer(serializers.Serializer):
     transport = serializers.IntegerField(required=False)
     primary_transport = serializers.IntegerField(required=False)
     customer = serializers.IntegerField(required=False)
-    company = serializers.IntegerField(required=False)
     country = serializers.IntegerField(required=False)
     export_country = serializers.IntegerField(required=False)
     import_country = serializers.IntegerField(required=False)
@@ -72,7 +47,7 @@ class CarrierContactListSerializer(serializers.Serializer):
     status = serializers.BooleanField(required=False, allow_null=True)
     auto_approve = serializers.BooleanField(required=False, allow_null=True)
     search = serializers.CharField(required=False)
-    sort_column = serializers.CharField(required=False, default="created_at")
-    sort_order = serializers.CharField(required=False, default="desc")
+    sort_column = serializers.CharField(required=False, default='created_at')
+    sort_order = serializers.CharField(required=False, default='desc')
     page = serializers.IntegerField(required=False, default=1)
     page_size = serializers.IntegerField(required=False, default=10)

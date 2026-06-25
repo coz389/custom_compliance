@@ -12,13 +12,12 @@ from drf_spectacular.utils import extend_schema
 
 class CustomerLspAssocFilter(django_filters.FilterSet):
     customer = django_filters.NumberFilter(field_name='customer_id')
-    company = django_filters.NumberFilter(field_name='company_id')
     carrier = django_filters.NumberFilter(field_name='carrier_id')
     transport = django_filters.NumberFilter(field_name='transport_id')
 
     class Meta:
         model = CustomerLspAssoc
-        fields = ['customer', 'company', 'carrier', 'transport', 'status']
+        fields = ['customer', 'carrier', 'transport', 'status']
 
 
 class CustomerLspAssocListView(generics.GenericAPIView):
@@ -26,7 +25,7 @@ class CustomerLspAssocListView(generics.GenericAPIView):
     List all customer-LSP associations with filtering using POST method
     """
     queryset = CustomerLspAssoc.objects.select_related(
-        'customer', 'company', 'carrier', 'transport',
+        'customer', 'carrier', 'transport',
         'created_by', 'updated_by'
     ).all()
     serializer_class = CustomerLspAssocSerializer
@@ -66,7 +65,6 @@ class CustomerLspAssocListView(generics.GenericAPIView):
         if search:
             queryset = queryset.filter(
                 Q(customer__customer_name__icontains=search) |
-                Q(company__company_name__icontains=search) |
                 Q(carrier__carrier_name__icontains=search) |
                 Q(transport__name__icontains=search)
             )

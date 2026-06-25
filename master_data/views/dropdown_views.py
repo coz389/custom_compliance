@@ -155,30 +155,6 @@ class CustomerDropdownView(generics.ListAPIView):
         return queryset.order_by("customer_name")
 
 
-@extend_schema(
-    parameters=[
-        OpenApiParameter(
-            name="customer_name",
-            description="Optional case-insensitive customer name search.",
-            required=False,
-            type=str,
-            location=OpenApiParameter.QUERY,
-        ),
-    ],
-    responses={200: CustomerCompanyDropdownSerializer(many=True)},
-    tags=["Dropdown lists"],
-    description="Dropdown list of active customers.",
-    summary="Customer Company Dropdown",
-    operation_id="v1_customer_company_list_dropdown",
-)
-class CustomerCompaniesDropdownView(generics.ListAPIView):
-    serializer_class = CustomerCompanyDropdownSerializer
-    pagination_class = None
-    permission_classes = [permissions.IsAuthenticated, HasModulePermission]
-    module_code = "customers"
-    action_code = "view"
-    queryset = Customer.objects.filter(deleted_at__isnull=True, status=True).order_by('customer_name')
-    
 @extend_schema_view(get=extend_schema(
     responses={200: TransportModeBasicSerializer(many=False)},
     tags=["Dropdown lists"],
