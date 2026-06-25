@@ -13,6 +13,7 @@ from .transport_mode_serializers import TransportModeBasicSerializer,TransportMo
 from .carrier_serializers import CarrierSerializer, CarrierListRequestSerializer
 from .customer_lsp_assoc_serializers import CustomerLspAssocSerializer, CustomerLspAssocListSerializer
 from .carrier_contact_serializers import CarrierContactSerializer, CarrierContactListSerializer
+from .inspection_area_serializers import InspectionAreaListSerializer,InspectionAreaListRequestSerializer,InspectionAreaCreateSerializer,InspectionAreaUpdateSerializer
 
 __all__=[
     'StatusSerializer','StatusListRequestSerializer','StatusUpdateSerializer',
@@ -30,4 +31,5 @@ __all__=[
     'CarrierSerializer', 'CarrierListRequestSerializer',
     'CustomerLspAssocSerializer', 'CustomerLspAssocListSerializer',
     'CarrierContactSerializer', 'CarrierContactListSerializer',
+    'InspectionAreaListSerializer','InspectionAreaListRequestSerializer','InspectionAreaCreateSerializer','InspectionAreaUpdateSerializer',
 ]

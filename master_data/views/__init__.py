@@ -13,6 +13,7 @@ from .transport_mode_view import TransportModeListView
 from .carrier_views import CarrierCreateView, CarrierDetailView, CarrierListView
 from .customer_lsp_assoc_views import CustomerLspAssocCreateView, CustomerLspAssocDetailView, CustomerLspAssocListView
 from .carrier_contact_views import CarrierContactCreateView, CarrierContactDetailView, CarrierContactListView
+from .inspection_area_views import InspectionAreaListView,InspectionAreaCreateView,InspectionAreaDetailView
 
 __all__=[
     #Status Views
@@ -44,4 +45,6 @@ __all__=[
     'CustomerLspAssocCreateView','CustomerLspAssocDetailView','CustomerLspAssocListView',
     #Carrier Contact Views
     'CarrierContactCreateView','CarrierContactDetailView','CarrierContactListView',
+    #Inspection Area Views
+    'InspectionAreaListView','InspectionAreaCreateView','InspectionAreaDetailView',
 ]
