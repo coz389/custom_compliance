@@ -14,7 +14,8 @@ from master_data.views import (
     TransportModeDropdownView, TransportModeListView,
     CarrierCreateView, CarrierDetailView, CarrierListView,
     CustomerLspAssocCreateView, CustomerLspAssocDetailView, CustomerLspAssocListView,
-    CarrierContactCreateView, CarrierContactDetailView, CarrierContactListView
+    CarrierContactCreateView, CarrierContactDetailView, CarrierContactListView,
+    InspectionAreaListView,InspectionAreaCreateView,InspectionAreaDetailView
 )
 
 urlpatterns = [
@@ -83,5 +84,9 @@ urlpatterns = [
     path('carrier-contacts', CarrierContactListView.as_view(), name='carrier_contact_list'),
     path('carrier-contacts/add', CarrierContactCreateView.as_view(), name='carrier_contact_create'),
     path('carrier-contacts/<int:pk>', CarrierContactDetailView.as_view(), name='carrier_contact_detail'),
+    #Inspection Area management
+    path('inspection-areas', InspectionAreaListView.as_view(), name='inspection_areas_list_filter'),
+    path('inspection-areas/add', InspectionAreaCreateView.as_view(), name='inspection_areas_create'),
+    path('inspection-areas/<int:pk>', InspectionAreaDetailView.as_view(), name='inspection_areas_detail'),
 ]
 
