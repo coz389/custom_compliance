@@ -1,4 +1,5 @@
 from .status_view import StatusListView, StatusCreateView,StatusDetailView
+from .sub_status_view import SubStatusListView, SubStatusDetailView
 from .carrier_type_view import CarrierTypeListView, CarrierTypeCreateView,CarrierTypeDetailView
 from .city_views import CityCreateView, CityDetailView, CityListView
 from .container_views import ContainerCreateView, ContainerDetailView, ContainerListView
@@ -18,6 +19,8 @@ from .inspection_area_views import InspectionAreaListView,InspectionAreaCreateVi
 __all__=[
     #Status Views
     'StatusListView','StatusCreateView','StatusDetailView',
+    #Sub Status Views
+    'SubStatusListView','SubStatusDetailView',
     #carrier type view
     'CarrierTypeListView','CarrierTypeCreateView','CarrierTypeDetailView',
     #Country City States Views

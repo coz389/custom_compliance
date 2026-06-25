@@ -1,6 +1,7 @@
 from django.urls import path
 from master_data.views import (
-    StatusListView,StatusDetailView,StatusCreateView, CarrierTypeListView,CarrierTypeCreateView,CarrierTypeDetailView,
+    StatusListView,StatusDetailView,StatusCreateView,
+    SubStatusListView,SubStatusDetailView, CarrierTypeListView,CarrierTypeCreateView,CarrierTypeDetailView,
     CountryDropdownView, StateDropdownView,CityCreateView, CityDetailView, CityListView,TransportModeDropdownView,
     ContainerCreateView, ContainerDetailView, ContainerListView,
     EquipmentCreateView, EquipmentDetailView, EquipmentListView,
@@ -41,6 +42,9 @@ urlpatterns = [
     path('status', StatusListView.as_view(), name='status_list_filter'),
     # path('status/add', StatusCreateView.as_view(), name='status_create'),
     path('status/<int:pk>', StatusDetailView.as_view(), name='status_detail'),
+    # Sub Status
+    path('sub-status', SubStatusListView.as_view(), name='sub_status_list_filter'),
+    path('sub-status/<int:pk>', SubStatusDetailView.as_view(), name='sub_status_detail'),
     # Carrier Types
     # path('carrier-types', CarrierTypeListView.as_view(), name='carrier_types_list_filter'),
     # path('carrier-types/add', CarrierTypeCreateView.as_view(), name='carrier_types_create'),
