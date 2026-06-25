@@ -14,6 +14,7 @@ from .transport_mode import TransportMode
 from .carrier import Carrier
 from .customer_lsp_assoc import CustomerLspAssoc
 from .carrier_contact import CarrierContact
+from .sub_status import SubStatus
 
 __all__=[
     'Status',
@@ -32,4 +33,5 @@ __all__=[
     "Carrier",
     "CustomerLspAssoc",
     "CarrierContact",
+    "SubStatus"
 ]
