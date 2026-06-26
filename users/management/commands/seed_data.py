@@ -61,6 +61,7 @@ class Command(BaseCommand):
             {'name': 'Carrier Contacts', 'code': 'carrier_contacts', 'icon': 'address-book', 'order': 25,'created_by':admin_user,'created_at':timezone.now()},
             {'name': 'Inspection Area', 'code': 'inspection_area', 'icon': 'fa-check', 'order': 26,'created_by':admin_user,'created_at':timezone.now()},
             {'name': 'Custom Officer', 'code': 'custom_officer', 'icon': 'fa-user-police', 'order': 27,'created_by':admin_user,'created_at':timezone.now()},
+            {'name': 'Sub Status', 'code': 'sub_status', 'icon': 'archive', 'order': 28,'created_by':admin_user,'created_at':timezone.now()},
         ]
         modules = {}
         for mod in modules_data:
@@ -127,6 +128,7 @@ class Command(BaseCommand):
             'carriers': ['view', 'add', 'update', 'delete'],
             'customer_lsp_assoc': ['view', 'add', 'update', 'delete'],
             'carrier_contacts': ['view', 'add', 'update', 'delete'],
+            'sub_status': ['view', 'add', 'update', 'delete'],
             'inspection_area': ['view', 'add', 'update', 'delete'],
             'custom_officer': ['view', 'add', 'update', 'delete'],
         }
@@ -184,6 +186,7 @@ class Command(BaseCommand):
                 'carriers': ['view', 'add', 'update', 'delete'],
                 'customer_lsp_assoc': ['view', 'add', 'update', 'delete'],
                 'carrier_contacts': ['view', 'add', 'update', 'delete'],
+                'sub_status': ['view', 'add', 'update', 'delete'],
                 'inspection_area': ['view', 'add', 'update', 'delete'],
                 'custom_officer': ['view', 'add', 'update', 'delete'],
             },

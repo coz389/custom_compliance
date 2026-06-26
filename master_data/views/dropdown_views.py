@@ -1,5 +1,5 @@
 from django.db.models import Q
-from drf_spectacular.utils import OpenApiParameter, extend_schema
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import generics, permissions
 
 from core.permissions import HasModulePermission
@@ -14,7 +14,7 @@ from master_data.serializers import (
 )
 
 
-@extend_schema(
+@extend_schema_view( get=extend_schema(
     parameters=[
         OpenApiParameter(
             name="country_name",
@@ -29,7 +29,7 @@ from master_data.serializers import (
     description="Dropdown list of countries.",
     summary="Country Dropdown",
     operation_id="v1_country_list",
-)
+))
 class CountryDropdownView(generics.ListAPIView):
     serializer_class = CountryDropdownSerializer
     pagination_class = None
@@ -48,7 +48,7 @@ class CountryDropdownView(generics.ListAPIView):
         return queryset.order_by("country_name")
 
 
-@extend_schema(
+@extend_schema_view( get=extend_schema(
     parameters=[
         OpenApiParameter(
             name="country_id",
@@ -70,7 +70,7 @@ class CountryDropdownView(generics.ListAPIView):
     description="Dropdown list of states filtered by country.",
     summary="State Dropdown",
     operation_id="v1_state_list",
-)
+))
 class StateDropdownView(generics.ListAPIView):
     serializer_class = StateDropdownSerializer
     pagination_class = None
@@ -88,8 +88,7 @@ class StateDropdownView(generics.ListAPIView):
 
         return queryset.order_by("state_name")
 
-
-@extend_schema(
+@extend_schema_view(get=extend_schema(
     parameters=[
         OpenApiParameter(
             name="search",
@@ -104,7 +103,7 @@ class StateDropdownView(generics.ListAPIView):
     description="Dropdown list of active equipment items.",
     summary="Equipment Dropdown",
     operation_id="v1_equipment_list_dropdown",
-)
+))
 class EquipmentDropdownView(generics.ListAPIView):
     serializer_class = EquipmentDropdownSerializer
     pagination_class = None
@@ -123,7 +122,7 @@ class EquipmentDropdownView(generics.ListAPIView):
         return queryset.order_by("code")
 
 
-@extend_schema(
+@extend_schema_view(get=extend_schema(
     parameters=[
         OpenApiParameter(
             name="customer_name",
@@ -138,7 +137,7 @@ class EquipmentDropdownView(generics.ListAPIView):
     description="Dropdown list of active customers.",
     summary="Customer Dropdown",
     operation_id="v1_customer_list_dropdown",
-)
+))
 class CustomerDropdownView(generics.ListAPIView):
     serializer_class = CustomerDropdownSerializer
     pagination_class = None
@@ -180,13 +179,13 @@ class CustomerCompaniesDropdownView(generics.ListAPIView):
     action_code = "view"
     queryset = Customer.objects.filter(deleted_at__isnull=True, status=True).order_by('customer_name')
     
-@extend_schema(
+@extend_schema_view(get=extend_schema(
     responses={200: TransportModeBasicSerializer(many=False)},
     tags=["Dropdown lists"],
     description="Dropdown list of active transport modes.",
     summary="Transport mode Dropdown",
     operation_id="v1_transport_mode_list_dropdown",
-)
+))
 class TransportModeDropdownView(generics.ListAPIView):
     serializer_class = TransportModeBasicSerializer
     pagination_class = None
