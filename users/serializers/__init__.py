@@ -1,7 +1,7 @@
 from .role_serializers import RoleSerializer,RoleListRequestSerializer,RoleDetailsSerializer
 from .module_serializers import ModuleSerializer
 from .role_permission_serializers import RolePermissionSerializer,RolePermissionCreateUpdateSerializer,ModuleActionDropdownSerializer,RolePermissionListSerializer
-from .user_serializers import UserSerializer, UserCreateSerializer, UserUpdateSerializer,UserListRequestSerializer
+from .user_serializers import UserSerializer, UserCreateSerializer, UserUpdateSerializer,UserListRequestSerializer,UserDropdownSerializer
 from .auth_serializers import RegisterSerializer,ChangePasswordSerializer,LoginSerializer,LogoutSerializer,LogoutAllSerializer
 __all__ = [
     'RoleSerializer',
@@ -11,7 +11,7 @@ __all__ = [
     'UserSerializer',
     'UserCreateSerializer',
     'UserUpdateSerializer',
-    'UserListRequestSerializer',
+    'UserListRequestSerializer','UserDropdownSerializer',
     'RegisterSerializer',
     'ChangePasswordSerializer',
     'LoginSerializer',

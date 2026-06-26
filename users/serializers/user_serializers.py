@@ -224,3 +224,9 @@ class UserListRequestSerializer(serializers.Serializer):
     page_size = serializers.IntegerField(required=False, default=10)
     sort_column = serializers.CharField(required=False, default='created_at')
     sort_order = serializers.ChoiceField(choices=['asc', 'desc'], required=False, default='asc')
+
+
+class UserDropdownSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "username", "email")
