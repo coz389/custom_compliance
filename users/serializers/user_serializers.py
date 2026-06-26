@@ -186,7 +186,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone_number']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone_number','role']
     
     def validate_username(self, value):
         """Username validation for update (exclude current user)"""
@@ -224,3 +224,9 @@ class UserListRequestSerializer(serializers.Serializer):
     page_size = serializers.IntegerField(required=False, default=10)
     sort_column = serializers.CharField(required=False, default='created_at')
     sort_order = serializers.ChoiceField(choices=['asc', 'desc'], required=False, default='asc')
+
+
+class UserDropdownSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "username", "email")

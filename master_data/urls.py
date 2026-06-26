@@ -15,7 +15,8 @@ from master_data.views import (
     CarrierCreateView, CarrierDetailView, CarrierListView,
     CustomerLspAssocCreateView, CustomerLspAssocDetailView, CustomerLspAssocListView,
     CarrierContactCreateView, CarrierContactDetailView, CarrierContactListView,
-    InspectionAreaListView,InspectionAreaCreateView,InspectionAreaDetailView
+    InspectionAreaListView,InspectionAreaCreateView,InspectionAreaDetailView,
+    CustomsOfficerShiftListView,CustomsOfficerShiftCreateView,CustomsOfficerShiftDetailView
 )
 
 urlpatterns = [
@@ -88,5 +89,9 @@ urlpatterns = [
     path('inspection-areas', InspectionAreaListView.as_view(), name='inspection_areas_list_filter'),
     path('inspection-areas/add', InspectionAreaCreateView.as_view(), name='inspection_areas_create'),
     path('inspection-areas/<int:pk>', InspectionAreaDetailView.as_view(), name='inspection_areas_detail'),
+    #Custom Officer Shift management
+    path('custom-officer-shifts', CustomsOfficerShiftListView.as_view(), name='custom_officer_shifts_list_filter'),
+    path('custom-officer-shifts/add', CustomsOfficerShiftCreateView.as_view(), name='custom_officer_shifts_create'),
+    path('custom-officer-shifts/<int:pk>', CustomsOfficerShiftDetailView.as_view(), name='custom_officer_shifts_detail'),
 ]
 

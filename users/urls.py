@@ -3,7 +3,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from users.views import (
     LoginView,RegisterView, UserProfileView, ChangePasswordView, 
     LogoutView, LogoutAllView,
-    UserListView, UserDetailView,UserActiveInactiveView, 
+    UserListView, UserDetailView,UserActiveInactiveView,UserListByRoleDropdownView,
     RoleCreateView,RoleListView, RoleDetailView, 
     ModuleListCreateView, ModuleDetailView, 
     RolePermissionListCreateView,RolePermissionListView, RolePermissionDetailView,RolePermissionCreateView,ModuleActionAssocDropdownView,BulkRolePermissionView
@@ -27,6 +27,7 @@ urlpatterns = [
     path('users', UserListView.as_view(), name='user_list'),
     path('users/<int:pk>', UserDetailView.as_view(), name='user_detail'),
     path('users/<int:pk>/toggle-status', UserActiveInactiveView.as_view(), name='user_toggle_status'),
+    path('users/dropdown/<int:role_id>', UserListByRoleDropdownView.as_view(), name='user-dropdown-by-role'),
 
     # Roles
     path('roles', RoleListView.as_view(), name='role_list_filter'),

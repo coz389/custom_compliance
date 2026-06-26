@@ -1,5 +1,5 @@
 from django.db import models
-from jsonschema import ValidationError
+from django.core.exceptions import ValidationError
 from core.models import BaseModel
 from django.core.validators import MinValueValidator
 

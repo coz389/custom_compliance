@@ -15,6 +15,7 @@ from .carrier_views import CarrierCreateView, CarrierDetailView, CarrierListView
 from .customer_lsp_assoc_views import CustomerLspAssocCreateView, CustomerLspAssocDetailView, CustomerLspAssocListView
 from .carrier_contact_views import CarrierContactCreateView, CarrierContactDetailView, CarrierContactListView
 from .inspection_area_views import InspectionAreaListView,InspectionAreaCreateView,InspectionAreaDetailView
+from .custom_officer_shift_views import CustomsOfficerShiftListView,CustomsOfficerShiftCreateView,CustomsOfficerShiftDetailView
 
 __all__=[
     #Status Views
@@ -50,4 +51,6 @@ __all__=[
     'CarrierContactCreateView','CarrierContactDetailView','CarrierContactListView',
     #Inspection Area Views
     'InspectionAreaListView','InspectionAreaCreateView','InspectionAreaDetailView',
+    #Custom Officer Shift views
+    'CustomsOfficerShiftListView','CustomsOfficerShiftCreateView','CustomsOfficerShiftDetailView',
 ]

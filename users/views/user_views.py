@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from yaml import serializer
 from core.pagination import StandardResultsSetPagination
-from users.serializers import UserSerializer, UserCreateSerializer,UserListRequestSerializer,UserUpdateSerializer
+from users.serializers import UserSerializer, UserCreateSerializer,UserListRequestSerializer,UserUpdateSerializer,UserDropdownSerializer
 from core.permissions import HasModulePermission
 from rest_framework.views import APIView
 from django.db.models import Q
@@ -310,3 +310,26 @@ class UserActiveInactiveView(APIView):
 
         status_str = "activated" if user.is_active else "deactivated"
         return Response({"detail": f"User has been {status_str}."}, status=status.HTTP_200_OK)
+    
+@extend_schema(tags=['Users Management']) 
+class UserListByRoleDropdownView(APIView):
+    """
+    Dropdown API: Get users by role_id
+    """
+    permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+    module_code = 'user_management'
+    action_code = 'view'
+
+    def get(self, request, role_id):   # ✅ FIX HERE
+
+        users = User.objects.filter(
+            role_id=role_id,
+            is_active=True
+        ).only("id", "username", "email")
+
+        serializer = UserDropdownSerializer(users, many=True)
+
+        return Response({
+            "status": "success",
+            "results": serializer.data
+        }, status=status.HTTP_200_OK)
