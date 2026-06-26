@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 
 from master_data.models import Country, State, Equipment, Customer, TransportMode
 
@@ -46,14 +47,14 @@ class CustomerDropdownSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 class CustomerCompanyDropdownSerializer(serializers.ModelSerializer):
-    companies = serializers.SerializerMethodField()
+    # companies = serializers.SerializerMethodField()
     class Meta:
         model = Customer
-        fields = ["id", "customer_name", "customer_code", "companies"]
+        fields = ["id", "customer_name", "customer_code"] #, "companies"
         read_only_fields = fields
 
-    def get_companies(self, obj):
-        return obj.company_set.values("id", "company_name", "company_code")
+    # def get_companies(self, obj):
+    #     return obj.company_set.values("id", "company_name", "company_code")
 
 
 class TransportModeDropdownSerializer(serializers.ModelSerializer):

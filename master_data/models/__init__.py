@@ -15,7 +15,7 @@ from .carrier import Carrier
 from .customer_lsp_assoc import CustomerLspAssoc
 from .carrier_contact import CarrierContact
 from .inspection_area import InspectionArea
-from .custom_officer_shift import CustomsOfficerShift
+from .custom_officer_shift import CustomsOfficerShift,WORKING_DAYS
 
 __all__=[
     'Status',
@@ -35,5 +35,5 @@ __all__=[
     "CustomerLspAssoc",
     "CarrierContact",
     'InspectionArea',
-    'CustomsOfficerShift'
+    'CustomsOfficerShift','WORKING_DAYS',
 ]

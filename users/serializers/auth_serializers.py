@@ -3,9 +3,8 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from users.models import User, Role, Module, RolePermission, user
-from django.core.validators import RegexValidator
-import re
-from django.core.validators import validate_email
+from django.core.validators import EmailValidator
+from django.db.models import Q
 
 
 User = get_user_model()
@@ -71,6 +70,16 @@ class RegisterSerializer(serializers.ModelSerializer):
             'blank': 'Confirm password is required.',
         }
     )
+    email = serializers.EmailField(
+        required=True,
+        validators=[EmailValidator(message="Enter a valid email address.")],
+        error_messages={
+            "required": "Email is required.",
+            "blank": "Email cannot be empty.",
+            "invalid": "Enter a valid email address.",
+        }
+    )
+
     # first_name = serializers.CharField(
     #     required=True, 
     #     allow_blank=False,
@@ -112,53 +121,58 @@ class RegisterSerializer(serializers.ModelSerializer):
                 }
             }
         }
-
     
+    # -------------------------
+    # FIELD VALIDATION
+    # -------------------------
+    def validate_email(self, value):
+        value = value.strip().lower()
+
+        if User.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError(
+                "Email is already registered."
+            )
+
+        return value
+    
+    # -------------------------
+    # OBJECT VALIDATION
+    # -------------------------
     def validate(self, attrs):
-        """Cross-field validations for similarity and strength"""
-        password = attrs.get('password')
-        email = attrs.get('email')
-        username = attrs.get('username')
-        
-        errors = {}
-        #Check if password and password2 match at field level to ensure it shows up with other errors
-        if password and password !=  attrs.get('password2'):
-            errors['password'] = "Passwords do not match."
-        
-        # Password strength validation (only if they match, which is checked in validate_password2)
-        if password and password == attrs.get('password2'):
-            try:
-                PasswordValidator.validate_strength(password)
-                PasswordValidator.validate_common_passwords(password)
-            except Exception as e:
-                errors['password'] = str(e)
-        
-        # Email and password similarity check
-        if email and password and email.split('@')[0] in password.lower():
-            errors['password'] = "Password cannot be too similar to your email"
-        
-        # Username and password similarity check
-        if username and password and username.lower() in password.lower():
-            errors['password'] = "Password cannot be too similar to your username"
-        
-        if errors:
-            raise serializers.ValidationError(errors)
-        
-        return attrs
-    
+        if attrs["password"] != attrs["password2"]:
+            raise serializers.ValidationError({
+                "password2": "Passwords do not match."
+            })
 
+        return attrs
+
+
+     # -------------------------
+    # CREATE USER
+    # -------------------------
     def create(self, validated_data):
-        validated_data.pop('password2')
-        password = validated_data.pop('password')
-        # Assign reader role automatically
-        reader_role = Role.objects.get(code='port_user')
+        validated_data.pop("password2")
         user = User.objects.create_user(
-            role=reader_role,
-            **validated_data
+            email=validated_data["email"],
+            username=validated_data["username"],
+            first_name=validated_data.get("first_name", ""),
+            last_name=validated_data.get("last_name", ""),
+            password=validated_data["password"],
         )
-        user.set_password(password)
-        user.save()
         return user
+    
+    # def create(self, validated_data):
+    #     validated_data.pop('password2')
+    #     password = validated_data.pop('password')
+    #     # Assign reader role automatically
+    #     reader_role = Role.objects.get(code='port_user')
+    #     user = User.objects.create_user(
+    #         role=reader_role,
+    #         **validated_data
+    #     )
+    #     user.set_password(password)
+    #     user.save()
+    #     return user
 
 
 class ChangePasswordSerializer(serializers.Serializer):
@@ -176,3 +190,11 @@ class ChangePasswordSerializer(serializers.Serializer):
         user.set_password(self.validated_data['new_password'])
         user.save()
         return user
+    
+
+
+class LogoutSerializer(serializers.Serializer):
+    refresh = serializers.CharField(required=True)
+
+class LogoutAllSerializer(serializers.Serializer):
+    pass
