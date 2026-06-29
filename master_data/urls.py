@@ -16,7 +16,8 @@ from master_data.views import (
     CustomerLspAssocCreateView, CustomerLspAssocDetailView, CustomerLspAssocListView,
     CarrierContactCreateView, CarrierContactDetailView, CarrierContactListView,
     InspectionAreaListView,InspectionAreaCreateView,InspectionAreaDetailView,
-    CustomsOfficerShiftListView,CustomsOfficerShiftCreateView,CustomsOfficerShiftDetailView
+    CustomsOfficerShiftListView,CustomsOfficerShiftCreateView,CustomsOfficerShiftDetailView,
+    EmailTemplateListView,EmailTemplateCreateView,EmailTemplateDetailView,EmailTemplateHashDropdownView
 )
 
 urlpatterns = [
@@ -93,5 +94,10 @@ urlpatterns = [
     path('custom-officer-shifts', CustomsOfficerShiftListView.as_view(), name='custom_officer_shifts_list_filter'),
     path('custom-officer-shifts/add', CustomsOfficerShiftCreateView.as_view(), name='custom_officer_shifts_create'),
     path('custom-officer-shifts/<int:pk>', CustomsOfficerShiftDetailView.as_view(), name='custom_officer_shifts_detail'),
+    #Email Template
+    path('email-templates', EmailTemplateListView.as_view(), name='email_template_list_filter'),
+    path('email-templates/add', EmailTemplateCreateView.as_view(), name='email_template_create'),
+    path('email-templates/<int:pk>', EmailTemplateDetailView.as_view(), name='email_template_detail'),
+    path('email-template-hashes/<int:template_type>', EmailTemplateHashDropdownView.as_view(), name='email_template_hash_dropdown'),
 ]
 

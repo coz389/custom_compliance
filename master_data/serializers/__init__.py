@@ -4,7 +4,7 @@ from .carrier_type_serializers import CarrierTypeSerializer,CarrierTypeListReque
 from .city_serializers import CitySerializer, CityListRequestSerializer
 from .container_serializers import ContainerListRequestSerializer, ContainerSerializer
 from .equipment_serializers import EquipmentListRequestSerializer, EquipmentSerializer
-from .dropdown_serializers import CountryDropdownSerializer, StateDropdownSerializer, CustomerDropdownSerializer, EquipmentDropdownSerializer, TransportModeDropdownSerializer,CustomerCompanyDropdownSerializer
+from .dropdown_serializers import CountryDropdownSerializer, StateDropdownSerializer, CustomerDropdownSerializer, EquipmentDropdownSerializer, TransportModeDropdownSerializer,CustomerCompanyDropdownSerializer, EmailTemplateHashDropdownSerializer
 from .document_type_serializers import DocumentTypeSerializer,DocumentTypeListRequestSerializer
 from .seaport_serializers import SeaportListRequestSerializer, SeaportSerializer
 from .customer_serializers import CustomerSerializer, CustomerListRequestSerializer
@@ -16,6 +16,7 @@ from .customer_lsp_assoc_serializers import CustomerLspAssocSerializer, Customer
 from .carrier_contact_serializers import CarrierContactSerializer, CarrierContactListSerializer
 from .inspection_area_serializers import InspectionAreaListSerializer,InspectionAreaListRequestSerializer,InspectionAreaCreateSerializer,InspectionAreaUpdateSerializer
 from .custom_officer_shift_serializers import CustomsOfficerShiftListSerializer,CustomsOfficerShiftListRequestSerializer,CustomsOfficerShiftCreateSerializer,CustomsOfficerShiftUpdateSerializer
+from .email_template_serializers import EmailTemplateListSerializer,EmailTemplateListRequestSerializer,EmailTemplateCreateSerializer,EmailTemplateUpdateSerializer
 
 __all__=[
     'StatusSerializer','StatusListRequestSerializer','StatusUpdateSerializer',
@@ -24,7 +25,7 @@ __all__=[
     'CitySerializer','CityListRequestSerializer',
     'ContainerSerializer','ContainerListRequestSerializer',
     'EquipmentSerializer','EquipmentListRequestSerializer',
-    'CountryDropdownSerializer','StateDropdownSerializer', 'CustomerDropdownSerializer', 'EquipmentDropdownSerializer', 'TransportModeDropdownSerializer','CustomerCompanyDropdownSerializer',
+    'CountryDropdownSerializer','StateDropdownSerializer', 'CustomerDropdownSerializer', 'EquipmentDropdownSerializer', 'TransportModeDropdownSerializer','CustomerCompanyDropdownSerializer', 'EmailTemplateHashDropdownSerializer',
     'DocumentTypeSerializer','DocumentTypeListRequestSerializer',
     'SeaportSerializer','SeaportListRequestSerializer',
     'CustomerSerializer','CustomerListRequestSerializer',
@@ -36,4 +37,5 @@ __all__=[
     'CarrierContactSerializer', 'CarrierContactListSerializer',
     'InspectionAreaListSerializer','InspectionAreaListRequestSerializer','InspectionAreaCreateSerializer','InspectionAreaUpdateSerializer',
     'CustomsOfficerShiftListSerializer','CustomsOfficerShiftListRequestSerializer','CustomsOfficerShiftCreateSerializer','CustomsOfficerShiftUpdateSerializer',
+    'EmailTemplateListSerializer','EmailTemplateListRequestSerializer','EmailTemplateCreateSerializer','EmailTemplateUpdateSerializer',
 ]

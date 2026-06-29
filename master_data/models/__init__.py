@@ -17,6 +17,9 @@ from .carrier_contact import CarrierContact
 from .sub_status import SubStatus
 from .inspection_area import InspectionArea
 from .custom_officer_shift import CustomsOfficerShift,WORKING_DAYS
+from .email_template import EmailTemplate
+from .email_template_hash import EmailTemplateHash
+from .email_template_type import EmailTemplateTypes
 
 __all__=[
     'Status',
@@ -38,4 +41,7 @@ __all__=[
     "SubStatus"
     'InspectionArea',
     'CustomsOfficerShift','WORKING_DAYS',
+    'EmailTemplate',
+    'EmailTemplateHash',
+    'EmailTemplateTypes'
 ]
