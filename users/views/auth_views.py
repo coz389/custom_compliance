@@ -8,7 +8,9 @@ from users.serializers import (
     RegisterSerializer, 
     ChangePasswordSerializer, 
     LoginSerializer,
-    UserSerializer
+    UserSerializer,
+    LogoutSerializer,
+    LogoutAllSerializer
 )
 
 from rest_framework.permissions import IsAuthenticated
@@ -16,7 +18,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from drf_spectacular.utils import extend_schema
-
 
 User = get_user_model()
 @extend_schema(tags=['Auth Management']) 
@@ -74,9 +75,12 @@ class ChangePasswordView(APIView):
     Change current user's password
     """
     permission_classes = [permissions.IsAuthenticated]
-
+    serializer_class = ChangePasswordSerializer
     def post(self, request):
-        serializer = ChangePasswordSerializer(data=request.data, context={'request': request})
+        serializer = self.serializer_class(
+            data=request.data,
+            context={'request': request}
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(
@@ -86,33 +90,42 @@ class ChangePasswordView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-@extend_schema(tags=['Auth Management']) 
+@extend_schema(tags=['Auth Management'],request=LogoutSerializer) 
 class LogoutView(APIView):
     """
     Logout a specific session by blacklisting the refresh token.
     """
     permission_classes = [IsAuthenticated]
-
+    serializer_class = LogoutSerializer
     def post(self, request):
+        serializer = LogoutSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        refresh_token = serializer.validated_data["refresh"]
         try:
-            refresh_token = request.data.get("refresh")
-            if not refresh_token:
-                return Response({"detail": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST)
-            
             token = RefreshToken(refresh_token)
             token.blacklist()
-            return Response({"message": "Logout successful."}, status=status.HTTP_200_OK)
+            return Response(
+                {"message": "Logout successful."},
+                status=status.HTTP_200_OK
+            )
         except Exception as e:
-            return Response({"detail": "Invalid or expired refresh token."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Invalid or expired refresh token."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
-@extend_schema(tags=['Auth Management']) 
+@extend_schema(
+    tags=['Auth Management'],
+    request=None,  # or LogoutAllSerializer (both work)
+    responses={200: None}
+) 
 class LogoutAllView(APIView):
     """
     Logout from all sessions by blacklisting all outstanding tokens for the user.
     """
     permission_classes = [IsAuthenticated]
-
+    serializer_class = LogoutAllSerializer  # important for schema
     def post(self, request):
         tokens = OutstandingToken.objects.filter(user=request.user)
         for token in tokens:

@@ -13,6 +13,12 @@ from .transport_mode import TransportMode
 from .carrier import Carrier
 from .customer_lsp_assoc import CustomerLspAssoc
 from .carrier_contact import CarrierContact
+from .sub_status import SubStatus
+from .inspection_area import InspectionArea
+from .custom_officer_shift import CustomsOfficerShift,WORKING_DAYS
+from .email_template import EmailTemplate
+from .email_template_hash import EmailTemplateHash
+from .email_template_type import EmailTemplateTypes
 
 __all__=[
     'Status',
@@ -30,4 +36,10 @@ __all__=[
     "Carrier",
     "CustomerLspAssoc",
     "CarrierContact",
+    "SubStatus"
+    'InspectionArea',
+    'CustomsOfficerShift','WORKING_DAYS',
+    'EmailTemplate',
+    'EmailTemplateHash',
+    'EmailTemplateTypes'
 ]

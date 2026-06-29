@@ -5,12 +5,15 @@ from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from yaml import serializer
 from core.pagination import StandardResultsSetPagination
-from users.serializers import UserSerializer, UserCreateSerializer,UserListRequestSerializer,UserUpdateSerializer
+from users.serializers import UserSerializer, UserCreateSerializer,UserListRequestSerializer,UserUpdateSerializer,UserDropdownSerializer,UserActivityLogListSerializer,UserActivityLogListRequestSerializer
 from core.permissions import HasModulePermission
 from rest_framework.views import APIView
 from django.db.models import Q
+from datetime import datetime
 from drf_spectacular.utils import extend_schema,inline_serializer, OpenApiExample,extend_schema_view
 from django.db import transaction
+from users.models import UserCompanyAssoc
+from core.models import UserActivityLog
 User = get_user_model()
 
 class UserFilter(django_filters.FilterSet):
@@ -271,3 +274,176 @@ class UserActiveInactiveView(APIView):
 
         status_str = "activated" if user.is_active else "deactivated"
         return Response({"detail": f"User has been {status_str}."}, status=status.HTTP_200_OK)
+    
+@extend_schema(tags=['Users Management']) 
+class UserListByRoleDropdownView(APIView):
+    """
+    Dropdown API: Get users by role_id
+    """
+    permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+    module_code = 'user_management'
+    action_code = 'view'
+
+    def get(self, request, role_id):
+
+        users = User.objects.filter(
+            role_id=role_id,
+            is_active=True
+        ).only("id", "username", "email")
+
+        serializer = UserDropdownSerializer(users, many=True)
+
+        return Response({
+            "status": "success",
+            "results": serializer.data
+        }, status=status.HTTP_200_OK)
+    
+
+
+
+class UserActivityLogFilter(django_filters.FilterSet):
+    user_username = django_filters.CharFilter(
+        field_name="user__username",
+        lookup_expr="icontains"
+    )
+    user_email = django_filters.CharFilter(
+        field_name="user__email",
+        lookup_expr="icontains"
+    )
+    model_name = django_filters.CharFilter(
+        lookup_expr="icontains"
+    )
+
+    action_name = django_filters.CharFilter(
+        lookup_expr="iexact"
+    )
+
+    object_id = django_filters.NumberFilter()
+
+    timestamp = django_filters.DateFilter(
+        field_name="timestamp",
+        lookup_expr="date"
+    )
+
+    timestamp_min = django_filters.DateFilter(
+        field_name="timestamp",
+        lookup_expr="date__gte"
+    )
+
+    timestamp_max = django_filters.DateFilter(
+        field_name="timestamp",
+        lookup_expr="date__lte"
+    )
+    
+    class Meta:
+        model = UserActivityLog
+        fields = ['user_username', 'user_email','model_name','action_name','object_id', 'timestamp', 'timestamp_min', 'timestamp_max']
+
+
+class UserActivityLogListView(APIView):
+    """
+    POST method
+    """
+    permission_classes = [HasModulePermission]
+    module_code = 'user_management'
+    action_code = 'view'  # default to view, will adjust in check_permissions
+
+    pagination_class = StandardResultsSetPagination 
+    @extend_schema(
+        request=UserActivityLogListRequestSerializer,
+        responses={200: UserActivityLogListSerializer(many=True)},
+        tags=['Users Management'], # Grouping in Swagger UI
+        description="List all User activity logs with optional filtering, sorting, and pagination. Use POST method to send filter criteria in the request body.", # Detailed description for Swagger UI
+        summary="List User Activity Logs (With Filter)",
+        operation_id="user_activity_logs_list_post"
+    )
+
+    def post(self, request):   
+        user = self.request.user
+        # print(f"Logged in Users : {user.__dict__}")   
+        # Clean request data: strip spaces from keys and values
+        clean_data = {k.strip(): (v.strip() if isinstance(v, str) else v) 
+                      for k, v in request.data.items()}
+        
+        # Sirf active records (Soft Delete handling) [History]
+        # queryset = UserActivityLog.objects.all()
+        queryset = UserActivityLog.objects.select_related(
+            "user"
+        )
+
+        # 1. Apply filters
+        filterset = UserActivityLogFilter(clean_data, queryset=queryset)
+        if filterset.is_valid():
+            queryset = filterset.qs
+        else:
+            return Response(filterset.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        # 2. Global Search
+        search = clean_data.get('search')
+        if search:
+            query = (
+                Q(user__username__icontains=search) |
+                Q(user__email__icontains=search) |
+                Q(model_name__icontains=search) |
+                Q(action_name__icontains=search) |
+                Q(description__icontains=search) |
+                Q(ip_address__icontains=search) |
+                Q(user_agent__icontains=search)
+            )
+            # Search by Object ID
+            if search.isdigit():
+                query |= Q(object_id=int(search))
+
+            # Search by Date
+            try:
+                search_date = datetime.strptime(
+                    search,
+                    "%Y-%m-%d"
+                ).date()
+
+                query |= Q(timestamp__date=search_date)
+
+            except ValueError:
+                pass
+
+            queryset = queryset.filter(query)
+
+
+        # 3. Ordering
+        sort_column = clean_data.get('sort_column', 'timestamp')
+        sort_order = clean_data.get('sort_order', 'desc') # default to newest first
+        
+        # Validate sort_column exists in model
+        allowed_columns = [
+            "timestamp",
+            "model_name",
+            "action_name",
+            "object_id",
+        ] #[f.name for f in UserActivityLog._meta.fields]
+        if sort_column in allowed_columns:
+            if sort_order.lower() == 'desc':
+                queryset = queryset.order_by(f'-{sort_column}')
+            else:
+                queryset = queryset.order_by(f'{sort_column}')
+
+        # 4. Pagination [1]
+        paginator = self.pagination_class()
+        page_num = clean_data.get('page', 1)
+        page_size = clean_data.get('page_size', paginator.page_size)
+        paginator.page_size = page_size
+        try:
+            request.query_params._mutable = True
+            request.query_params['page'] = page_num
+            request.query_params['page_size'] = page_size
+            request.query_params._mutable = False
+            page = paginator.paginate_queryset(queryset, request, view=self)
+            
+            if page is not None:
+                serializer = UserActivityLogListSerializer(page, many=True) 
+                return paginator.get_paginated_response(serializer.data)
+
+        except Exception as e:
+            return Response({"success": False, "detail": str(e)}, status=400)
+
+        serializer = UserActivityLogListSerializer(queryset, many=True)
+        return Response(serializer.data)

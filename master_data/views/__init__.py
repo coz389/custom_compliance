@@ -1,4 +1,5 @@
 from .status_view import StatusListView, StatusCreateView,StatusDetailView
+from .sub_status_view import SubStatusListView, SubStatusDetailView
 from .carrier_type_view import CarrierTypeListView, CarrierTypeCreateView,CarrierTypeDetailView
 from .city_views import CityCreateView, CityDetailView, CityListView
 from .container_views import ContainerCreateView, ContainerDetailView, ContainerListView
@@ -12,10 +13,15 @@ from .transport_mode_view import TransportModeListView
 from .carrier_views import CarrierCreateView, CarrierDetailView, CarrierListView
 from .customer_lsp_assoc_views import CustomerLspAssocCreateView, CustomerLspAssocDetailView, CustomerLspAssocListView
 from .carrier_contact_views import CarrierContactCreateView, CarrierContactDetailView, CarrierContactListView
+from .inspection_area_views import InspectionAreaListView,InspectionAreaCreateView,InspectionAreaDetailView
+from .custom_officer_shift_views import CustomsOfficerShiftListView,CustomsOfficerShiftCreateView,CustomsOfficerShiftDetailView
+from .email_template_views import EmailTemplateListView,EmailTemplateCreateView,EmailTemplateDetailView,EmailTemplateHashDropdownView
 
 __all__=[
     #Status Views
     'StatusListView','StatusCreateView','StatusDetailView',
+    #Sub Status Views
+    'SubStatusListView','SubStatusDetailView',
     #carrier type view
     'CarrierTypeListView','CarrierTypeCreateView','CarrierTypeDetailView',
     #Country City States Views
@@ -41,4 +47,10 @@ __all__=[
     'CustomerLspAssocCreateView','CustomerLspAssocDetailView','CustomerLspAssocListView',
     #Carrier Contact Views
     'CarrierContactCreateView','CarrierContactDetailView','CarrierContactListView',
+    #Inspection Area Views
+    'InspectionAreaListView','InspectionAreaCreateView','InspectionAreaDetailView',
+    #Custom Officer Shift views
+    'CustomsOfficerShiftListView','CustomsOfficerShiftCreateView','CustomsOfficerShiftDetailView',
+    #Email Template Views
+    'EmailTemplateListView','EmailTemplateCreateView','EmailTemplateDetailView','EmailTemplateHashDropdownView',
 ]

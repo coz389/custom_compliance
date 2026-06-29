@@ -1,6 +1,7 @@
 from django.urls import path
 from master_data.views import (
-    StatusListView,StatusDetailView,StatusCreateView, CarrierTypeListView,CarrierTypeCreateView,CarrierTypeDetailView,
+    StatusListView,StatusDetailView,StatusCreateView,
+    SubStatusListView,SubStatusDetailView, CarrierTypeListView,CarrierTypeCreateView,CarrierTypeDetailView,
     CountryDropdownView, StateDropdownView,CityCreateView, CityDetailView, CityListView,TransportModeDropdownView,
     ContainerCreateView, ContainerDetailView, ContainerListView,
     EquipmentCreateView, EquipmentDetailView, EquipmentListView,
@@ -12,7 +13,10 @@ from master_data.views import (
     TransportModeDropdownView, TransportModeListView,
     CarrierCreateView, CarrierDetailView, CarrierListView,
     CustomerLspAssocCreateView, CustomerLspAssocDetailView, CustomerLspAssocListView,
-    CarrierContactCreateView, CarrierContactDetailView, CarrierContactListView
+    CarrierContactCreateView, CarrierContactDetailView, CarrierContactListView,
+    InspectionAreaListView,InspectionAreaCreateView,InspectionAreaDetailView,
+    CustomsOfficerShiftListView,CustomsOfficerShiftCreateView,CustomsOfficerShiftDetailView,
+    EmailTemplateListView,EmailTemplateCreateView,EmailTemplateDetailView,EmailTemplateHashDropdownView
 )
 
 urlpatterns = [
@@ -39,6 +43,9 @@ urlpatterns = [
     path('status', StatusListView.as_view(), name='status_list_filter'),
     # path('status/add', StatusCreateView.as_view(), name='status_create'),
     path('status/<int:pk>', StatusDetailView.as_view(), name='status_detail'),
+    # Sub Status
+    path('sub-status', SubStatusListView.as_view(), name='sub_status_list_filter'),
+    path('sub-status/<int:pk>', SubStatusDetailView.as_view(), name='sub_status_detail'),
     # Carrier Types
     # path('carrier-types', CarrierTypeListView.as_view(), name='carrier_types_list_filter'),
     # path('carrier-types/add', CarrierTypeCreateView.as_view(), name='carrier_types_create'),
@@ -73,5 +80,18 @@ urlpatterns = [
     path('carrier-contacts', CarrierContactListView.as_view(), name='carrier_contact_list'),
     path('carrier-contacts/add', CarrierContactCreateView.as_view(), name='carrier_contact_create'),
     path('carrier-contacts/<int:pk>', CarrierContactDetailView.as_view(), name='carrier_contact_detail'),
+    #Inspection Area management
+    path('inspection-areas', InspectionAreaListView.as_view(), name='inspection_areas_list_filter'),
+    path('inspection-areas/add', InspectionAreaCreateView.as_view(), name='inspection_areas_create'),
+    path('inspection-areas/<int:pk>', InspectionAreaDetailView.as_view(), name='inspection_areas_detail'),
+    #Custom Officer Shift management
+    path('custom-officer-shifts', CustomsOfficerShiftListView.as_view(), name='custom_officer_shifts_list_filter'),
+    path('custom-officer-shifts/add', CustomsOfficerShiftCreateView.as_view(), name='custom_officer_shifts_create'),
+    path('custom-officer-shifts/<int:pk>', CustomsOfficerShiftDetailView.as_view(), name='custom_officer_shifts_detail'),
+    #Email Template
+    path('email-templates', EmailTemplateListView.as_view(), name='email_template_list_filter'),
+    path('email-templates/add', EmailTemplateCreateView.as_view(), name='email_template_create'),
+    path('email-templates/<int:pk>', EmailTemplateDetailView.as_view(), name='email_template_detail'),
+    path('email-template-hashes/<int:template_type>', EmailTemplateHashDropdownView.as_view(), name='email_template_hash_dropdown'),
 ]
 
