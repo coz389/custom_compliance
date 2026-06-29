@@ -132,11 +132,11 @@ class RolePermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = RolePermission
         fields = ['id', 'details']
-class RoleDetailsSerializer(serializers.Serializer):
+class RoleDetailsSerializer(serializers.ModelSerializer):
     created_by = serializers.SlugRelatedField(slug_field='username', read_only=True)
     updated_by = serializers.SlugRelatedField(slug_field='username', read_only=True)
     permissions = RolePermissionSerializer(source='role_permissions', many=True, read_only=True)
     class Meta:
         model = Role
         # fields = '__all__'
-        fields = ['id', 'name', 'code', 'permissions']
+        fields = ['id', 'name', 'code','description', 'status','created_by', 'created_at', 'updated_by','updated_at','permissions']
