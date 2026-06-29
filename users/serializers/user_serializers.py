@@ -5,6 +5,7 @@ from users.models import User, Role, Module, RolePermission, Action
 from django.core.validators import RegexValidator
 import re
 from django.core.validators import validate_email
+from core.models import UserActivityLog
 
 
 User = get_user_model()
@@ -213,7 +214,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-class UserListRequestSerializer(serializers.Serializer):
+class UserListRequestSerializer(serializers.ModelSerializer):
     """ Only for documentation and validation of list endpoint filters and pagination parameters in Swagger. Not used for actual filtering logic in the view."""
     search = serializers.CharField(required=False, allow_blank=True, help_text="Name, code ya description mein search karein")
     name = serializers.CharField(required=False, allow_blank=True)
@@ -230,3 +231,33 @@ class UserDropdownSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("id", "username", "email")
+
+
+
+
+
+class UserActivityLogListRequestSerializer(serializers.ModelSerializer):
+    """ Only for documentation and validation of list endpoint filters and pagination parameters in Swagger. Not used for actual filtering logic in the view."""
+    search = serializers.CharField(required=False,allow_blank=True)
+    user_username = serializers.CharField(required=False)
+    user_email = serializers.CharField(required=False)
+    model_name = serializers.CharField(required=False)
+    action_name = serializers.CharField(required=False)
+    object_id = serializers.IntegerField(required=False)
+    timestamp = serializers.DateField(required=False)
+    timestamp_min = serializers.DateField(required=False)
+    timestamp_max = serializers.DateField(required=False)
+    page = serializers.IntegerField(required=False,default=1)
+    page_size = serializers.IntegerField(required=False,default=10)
+    sort_column = serializers.CharField(required=False,default="timestamp")
+    sort_order = serializers.ChoiceField(choices=["asc", "desc"],default="desc",required=False)
+
+class UserActivityLogListSerializer(serializers.ModelSerializer):
+    user = UserDropdownSerializer(read_only=True)
+    user_username = serializers.CharField(source="user.username", read_only=True)
+    user_email = serializers.CharField(source="user.email", read_only=True)
+    class Meta:
+        model = UserActivityLog
+        fields = ('id','user', 'user_email', 'user_username','model_name','action_name','object_id','before_input','after_input','description','ip_address','user_agent','timestamp')
+        read_only_fields = ('id', 'timestamp')
+

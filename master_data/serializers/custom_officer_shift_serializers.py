@@ -40,16 +40,12 @@ class CustomsOfficerShiftListRequestSerializer(serializers.Serializer):
     """
     search = serializers.CharField(required=False, allow_blank=True, help_text="Search only User Name, Email, Remarks ,Start Date ,End Date and Working days")
     officer = serializers.CharField(required=False, allow_blank=True)
-    start_date = serializers.DateField(required=False, allow_null=True)
-    end_date = serializers.DateField(required=False, allow_null=True)
-    shift_start_time = serializers.TimeField(required=False, allow_null=True)
-    shift_end_time = serializers.TimeField(required=False, allow_null=True)
-    working_days = serializers.CharField(required=False, allow_blank=True)
-    status = serializers.BooleanField(required=False, allow_null=True)
-    created_at = serializers.DateField(required=False, allow_null=True)
+    model_name = serializers.CharField(required=False, allow_blank=True)
+    action_name = serializers.CharField(required=False, allow_blank=True)
+    description = serializers.CharField(required=False, allow_blank=True)
     page = serializers.IntegerField(required=False, default=1)
     page_size = serializers.IntegerField(required=False, default=20)
-    sort_column = serializers.CharField(required=False, default='created_at')
+    sort_column = serializers.CharField(required=False, default='timestamp')
     sort_order = serializers.ChoiceField(choices=['asc', 'desc'], required=False, default='asc')
 
 
