@@ -226,6 +226,9 @@ class UserListRequestSerializer(serializers.ModelSerializer):
     sort_column = serializers.CharField(required=False, default='created_at')
     sort_order = serializers.ChoiceField(choices=['asc', 'desc'], required=False, default='asc')
 
+    class Meta:
+        model = User
+        fields = ("search", "name", "email","phone_number","created_at","page","page_size","sort_column","sort_order")
 
 class UserDropdownSerializer(serializers.ModelSerializer):
     class Meta:
@@ -251,6 +254,24 @@ class UserActivityLogListRequestSerializer(serializers.ModelSerializer):
     page_size = serializers.IntegerField(required=False,default=10)
     sort_column = serializers.CharField(required=False,default="timestamp")
     sort_order = serializers.ChoiceField(choices=["asc", "desc"],default="desc",required=False)
+    class Meta:
+        model = UserActivityLog
+        fields = (
+            "search",
+            "user_username",
+            "user_email",
+            "model_name",
+            "action_name",
+            "object_id",
+            "ip_address",
+            "timestamp",
+            "timestamp_min",
+            "timestamp_max",
+            "page",
+            "page_size",
+            "sort_column",
+            "sort_order",
+        )
 
 class UserActivityLogListSerializer(serializers.ModelSerializer):
     user = UserDropdownSerializer(read_only=True)
@@ -258,6 +279,6 @@ class UserActivityLogListSerializer(serializers.ModelSerializer):
     user_email = serializers.CharField(source="user.email", read_only=True)
     class Meta:
         model = UserActivityLog
-        fields = ('id','user', 'user_email', 'user_username','model_name','action_name','object_id','before_input','after_input','description','ip_address','user_agent','timestamp')
+        fields = ('id','user', 'user_username', 'user_email','model_name','action_name','object_id','before_input','after_input','description','ip_address','user_agent','timestamp')
         read_only_fields = ('id', 'timestamp')
 
