@@ -216,7 +216,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
 class UserListRequestSerializer(serializers.ModelSerializer):
     """ Only for documentation and validation of list endpoint filters and pagination parameters in Swagger. Not used for actual filtering logic in the view."""
-    search = serializers.CharField(required=False, allow_blank=True, help_text="Name, code ya description mein search karein")
+    search = serializers.CharField(required=False, allow_blank=True, help_text="Name, code or description")
     name = serializers.CharField(required=False, allow_blank=True)
     email = serializers.EmailField(required=False, allow_null=True)
     phone_number = serializers.CharField(required=False, allow_null=True)
