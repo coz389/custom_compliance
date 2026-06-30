@@ -56,15 +56,26 @@ class RolePermissionSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     role_name = serializers.CharField(source='role.name', read_only=True)
     role_code = serializers.CharField(source='role.code', read_only=True)
+    customers = serializers.SerializerMethodField()
     class Meta:
         model = User
         fields = ('id', 'email', 'username', 'first_name', 'last_name', 'profile_pic',
-                  'bio', 'role', 'role_name', 'role_code', 'is_active', 'created_at')
+                  'bio', 'role', 'role_name', 'role_code', 'is_active', 'created_at','customers')
         read_only_fields = ('id', 'created_at')
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         return rep
+    
+    def get_customers(self, obj):
+        grouped = {}
+        for assoc in obj.user_customer_assoc.all():
+            customer = assoc.customer
+            grouped.setdefault(customer.id, {
+                "customer_id": customer.id,
+                "customer_name": customer.customer_name,
+            })
+        return list(grouped.values())
 
 class UserCreateSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])

@@ -10,7 +10,6 @@ from master_data.serializers import (
     EquipmentDropdownSerializer,
     StateDropdownSerializer,
     TransportModeBasicSerializer,
-    CustomerCompanyDropdownSerializer,
 )
 
 

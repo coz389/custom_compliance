@@ -4,6 +4,7 @@ from .module import Module
 from .action import Action
 from .role_permission import RolePermission
 from .module_action_assoc import ModuleActionAssoc
+from .user_customer_assoc import UserCustomerAssoc
 
 
 __all__ = [
@@ -13,4 +14,5 @@ __all__ = [
     'User',
     'RolePermission',
     'ModuleActionAssoc',
+    'UserCustomerAssoc'
 ]

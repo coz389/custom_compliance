@@ -12,7 +12,8 @@ from django.db.models import Q
 from datetime import datetime
 from drf_spectacular.utils import extend_schema,inline_serializer, OpenApiExample,extend_schema_view
 from django.db import transaction
-from users.models import UserCompanyAssoc
+from users.models import UserCustomerAssoc
+from master_data.models import Customer
 from core.models import UserActivityLog
 User = get_user_model()
 
@@ -135,7 +136,7 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
     @extend_schema(
         tags=['Users Management'],
         summary='Retrieve a user',
-        description='Get full details of a specific user.',
+        description='Get full details of a specific user including assigned companies.',
         responses={200: UserSerializer},
     )
     def get(self, request, *args, **kwargs):
@@ -143,26 +144,32 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
 
     @extend_schema(
         tags=['Users Management'],
-        summary='Update user',
-        description='Updates user fields.',
+        summary='Update user with customer assignments',
+        description='Updates user fields and replaces all existing customer assignments.',
         request=inline_serializer(
-            name='UserUpdateRequest',
+            name='UserUpdateWithCompaniesRequest',
             fields={
                 'first_name':   drf_serializers.CharField(required=False),
                 'last_name':    drf_serializers.CharField(required=False),
                 'email':        drf_serializers.EmailField(required=False),
                 'role':         drf_serializers.IntegerField(required=False),
                 'is_active':    drf_serializers.BooleanField(required=False),
+                'customer_ids':  drf_serializers.ListField(
+                    child=drf_serializers.IntegerField(min_value=1),
+                    required=False,
+                    help_text='List of Customer IDs. Replaces existing assignments.',
+                ),
             }
         ),
         examples=[
             OpenApiExample(
-                name='Update user',
+                name='Update user and assign customers',
                 value={
                     'first_name': 'Abhishek',
                     'last_name':  'Sahu',
                     'role':       1,
                     'is_active':  True,
+                    'customer_ids': [1, 2, 3],
                 },
                 request_only=True,
             )
@@ -183,6 +190,11 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
                 'email':       drf_serializers.EmailField(required=False),
                 'role':        drf_serializers.IntegerField(required=False),
                 'is_active':   drf_serializers.BooleanField(required=False),
+                'customer_ids': drf_serializers.ListField(
+                    child=drf_serializers.IntegerField(min_value=1),
+                    required=False,
+                    help_text='List of Customer IDs. Replaces existing assignments.',
+                ),
             }
         ),
         responses={200: UserSerializer},
@@ -192,7 +204,18 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
 
     @transaction.atomic
     def perform_update(self, serializer):
-        serializer.save()
+        instance = serializer.save()
+        customer_ids = self.request.data.get('customer_ids')
+
+        if not customer_ids:
+            return
+
+        instance.user_customer_assoc.all().delete()
+
+        UserCustomerAssoc.objects.bulk_create([
+            UserCustomerAssoc(user=instance, customer_id=int(cid), created_by=instance)
+            for cid in customer_ids
+        ])
 
 class UserDetailView123(generics.RetrieveUpdateAPIView):#RetrieveUpdateDestroyAPIView
     """
@@ -224,7 +247,22 @@ class UserDetailView123(generics.RetrieveUpdateAPIView):#RetrieveUpdateDestroyAP
     @transaction.atomic
     def perform_update(self, serializer):
         # Get Primary table (User) Instance and Save to other table
-        serializer.save()
+        instance = serializer.save()  
+        customer_ids = self.request.data.get('customer_ids')
+        if not customer_ids:
+            return
+        
+        # Delete all existing associations
+        UserCustomerAssoc.objects.filter(user=instance).delete()
+        
+        if not customer_ids:
+            return
+        
+        # Fresh insert
+        UserCustomerAssoc.objects.bulk_create([
+            UserCustomerAssoc(user=instance, customer_id=int(cid), created_by=instance)
+            for cid in customer_ids
+        ])
 
         
        
