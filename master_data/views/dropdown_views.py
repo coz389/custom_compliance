@@ -155,7 +155,7 @@ class CustomerDropdownView(generics.ListAPIView):
         return queryset.order_by("customer_name")
 
 
-@extend_schema(
+@extend_schema_view(get=extend_schema(
     parameters=[
         OpenApiParameter(
             name="customer_name",
@@ -170,7 +170,7 @@ class CustomerDropdownView(generics.ListAPIView):
     description="Dropdown list of active customers.",
     summary="Customer Company Dropdown",
     operation_id="v1_customer_company_list_dropdown",
-)
+))
 class CustomerCompaniesDropdownView(generics.ListAPIView):
     serializer_class = CustomerCompanyDropdownSerializer
     pagination_class = None

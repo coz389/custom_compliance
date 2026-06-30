@@ -217,7 +217,7 @@ class RolePermissionDetailView(generics.RetrieveUpdateDestroyAPIView):
 class BulkRolePermissionView(APIView):
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
     module_code = 'user_roles'
-
+    serializer_class = RolePermissionListSerializer
     def get_action_code(self):
         return 'update'
 
@@ -262,7 +262,7 @@ class BulkRolePermissionView(APIView):
             'module_action_assoc__module',
             'module_action_assoc__action'
         )
-        serializer = RolePermissionListSerializer(created, many=True)
+        serializer =  self.get_serializer(created, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 @extend_schema_view(get=extend_schema(

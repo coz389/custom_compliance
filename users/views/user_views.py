@@ -297,6 +297,7 @@ class UserActiveInactiveView(APIView):
     Activate or deactivate a user (admin only)
     """
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+    serializer_class = None
     module_code = 'user_management'
     action_code = 'update'
 
@@ -319,6 +320,7 @@ class UserListByRoleDropdownView(APIView):
     Dropdown API: Get users by role_id
     """
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+    serializer_class = UserDropdownSerializer
     module_code = 'user_management'
     action_code = 'view'
 
@@ -329,7 +331,7 @@ class UserListByRoleDropdownView(APIView):
             is_active=True
         ).only("id", "username", "email")
 
-        serializer = UserDropdownSerializer(users, many=True)
+        serializer = self.get_serializer(users, many=True)
 
         return Response({
             "status": "success",
