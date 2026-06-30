@@ -46,16 +46,6 @@ class CustomerDropdownSerializer(serializers.ModelSerializer):
         fields = ["id", "customer_name", "customer_code"]
         read_only_fields = fields
 
-class CustomerCompanyDropdownSerializer(serializers.ModelSerializer):
-    # companies = serializers.SerializerMethodField()
-    class Meta:
-        model = Customer
-        fields = ["id", "customer_name", "customer_code"] #, "companies"
-        read_only_fields = fields
-
-    # def get_companies(self, obj):
-    #     return obj.company_set.values("id", "company_name", "company_code")
-
 
 class TransportModeDropdownSerializer(serializers.ModelSerializer):
     class Meta:

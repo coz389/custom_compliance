@@ -12,6 +12,7 @@ class Equipment(BaseModel):
     class Meta:
         db_table = "equipments"
         managed = False
+        ordering = ['-updated_at']
 
     def __str__(self):
         return self.code

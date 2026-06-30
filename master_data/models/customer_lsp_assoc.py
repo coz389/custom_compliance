@@ -4,7 +4,6 @@ from core.models import BaseModel
 
 class CustomerLspAssoc(BaseModel):
     customer = models.ForeignKey("Customer", on_delete=models.CASCADE, related_name="lsp_assocs", db_column="customer_id",)
-    company = models.ForeignKey("Company", on_delete=models.CASCADE, related_name="lsp_assocs", db_column="company_id",)
     carrier = models.ForeignKey( "Carrier", on_delete=models.PROTECT, related_name="lsp_assocs", db_column="carrier_id",)
     transport = models.ForeignKey("TransportMode", on_delete=models.PROTECT, related_name="lsp_assocs", db_column="transport_id",
         null=True, blank=True,)
@@ -15,4 +14,4 @@ class CustomerLspAssoc(BaseModel):
         ordering = ["-updated_at"]
 
     def __str__(self):
-        return f"{self.customer} - {self.company} - {self.carrier}"
+        return f"{self.customer} - {self.carrier}"

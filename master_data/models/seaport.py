@@ -23,6 +23,7 @@ class Seaport(BaseModel):
     class Meta:
         db_table = "master_sea_ports"
         managed = False
+        ordering = ['-updated_at']
 
     def __str__(self):
         return self.port_name

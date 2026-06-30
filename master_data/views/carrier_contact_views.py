@@ -15,7 +15,6 @@ class CarrierContactFilter(django_filters.FilterSet):
     transport = django_filters.NumberFilter(field_name='transport_id')
     primary_transport = django_filters.NumberFilter(field_name='primary_transport_id')
     customer = django_filters.NumberFilter(field_name='customer_id')
-    company = django_filters.NumberFilter(field_name='company_id')
     country = django_filters.NumberFilter(field_name='country_id')
     export_country = django_filters.NumberFilter(field_name='export_country_id')
     import_country = django_filters.NumberFilter(field_name='import_country_id')
@@ -24,7 +23,7 @@ class CarrierContactFilter(django_filters.FilterSet):
     class Meta:
         model = CarrierContact
         fields = [
-            'carrier', 'transport', 'primary_transport', 'customer', 'company',
+            'carrier', 'transport', 'primary_transport', 'customer',
             'country', 'export_country', 'import_country', 'city',
             'status', 'auto_approve',
         ]
@@ -35,7 +34,7 @@ class CarrierContactListView(generics.GenericAPIView):
     List all carrier contacts with filtering using POST method
     """
     queryset = CarrierContact.objects.select_related(
-        'carrier', 'transport', 'primary_transport', 'customer', 'company',
+        'carrier', 'transport', 'primary_transport', 'customer',
         'country', 'export_country', 'import_country', 'city',
         'created_by', 'updated_by'
     ).all()
@@ -77,7 +76,6 @@ class CarrierContactListView(generics.GenericAPIView):
             queryset = queryset.filter(
                 Q(carrier__carrier_name__icontains=search) |
                 Q(customer__customer_name__icontains=search) |
-                Q(company__company_name__icontains=search) |
                 Q(type__icontains=search) |
                 Q(shipment_type__icontains=search) |
                 Q(service_type__icontains=search) |

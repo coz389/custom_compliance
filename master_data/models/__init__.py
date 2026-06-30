@@ -8,7 +8,6 @@ from .seaport import Seaport
 from .state import State
 from .document_type import DocumentType
 from .customer import Customer
-from .company import Company
 from .customer_doc_assoc import CustomerDocAssoc
 from .transport_mode import TransportMode
 from .carrier import Carrier
@@ -32,7 +31,6 @@ __all__=[
     "Country",
     "DocumentType",
     "Customer",
-    "Company",
     "CustomerDocAssoc",
     'TransportMode',
     "Carrier",

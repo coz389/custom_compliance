@@ -26,6 +26,7 @@ class Container(BaseModel):
     class Meta:
         db_table = "containers"
         managed = False
+        ordering = ['-updated_at']
 
     def __str__(self):
         return self.code

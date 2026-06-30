@@ -69,17 +69,11 @@ class UserSerializer(serializers.ModelSerializer):
     
     def get_customers(self, obj):
         grouped = {}
-        for assoc in obj.user_company_assoc.all():
-            company = assoc.company
-            customer = company.customer
-            entry = grouped.setdefault(customer.id, {
+        for assoc in obj.user_customer_assoc.all():
+            customer = assoc.customer
+            grouped.setdefault(customer.id, {
                 "customer_id": customer.id,
                 "customer_name": customer.customer_name,
-                "companies": [],
-            })
-            entry["companies"].append({
-                "company_id": company.id,
-                "company_name": company.company_name,
             })
         return list(grouped.values())
 

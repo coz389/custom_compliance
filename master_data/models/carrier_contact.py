@@ -20,10 +20,6 @@ class CarrierContact(BaseModel):
         "Customer", on_delete=models.CASCADE, related_name="carrier_contacts",
         db_column="customer_id", null=True, blank=True,
     )
-    company = models.ForeignKey(
-        "Company", on_delete=models.CASCADE, related_name="carrier_contacts",
-        db_column="company_id", null=True, blank=True,
-    )
     country = models.ForeignKey(
         "Country", on_delete=models.SET_NULL, related_name="carrier_contacts_country",
         db_column="country_id", null=True, blank=True,

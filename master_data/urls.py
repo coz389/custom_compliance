@@ -7,8 +7,7 @@ from master_data.views import (
     EquipmentCreateView, EquipmentDetailView, EquipmentListView,
     EquipmentDropdownView,
     SeaportCreateView, SeaportDetailView, SeaportListView,
-    CustomerCreateView, CustomerDetailView, CustomerListView, CustomerDropdownView,CustomerCompaniesDropdownView,
-    CompanyCreateView, CompanyDetailView, CompanyListView,
+    CustomerCreateView, CustomerDetailView, CustomerListView, CustomerDropdownView,
     CustomerDocAssocCreateView, CustomerDocAssocDetailView, CustomerDocAssocListView,
     DocumentTypeListView,DocumentTypeCreateView,DocumentTypeDetailView,DocumentTypeDropdownView,
     TransportModeDropdownView, TransportModeListView,
@@ -56,11 +55,6 @@ urlpatterns = [
     path('customers/add', CustomerCreateView.as_view(), name='customer_create'),
     path('customers/<int:pk>', CustomerDetailView.as_view(), name='customer_detail'),
     path('customers/dropdown', CustomerDropdownView.as_view(), name='customer_dropdown'),
-    # Companies
-    path('companies', CompanyListView.as_view(), name='company_list_filter'),
-    path('companies/add', CompanyCreateView.as_view(), name='company_create'),
-    path('companies/<int:pk>', CompanyDetailView.as_view(), name='company_detail'),
-    path('customer-companies/dropdown', CustomerCompaniesDropdownView.as_view(), name='customer_company_list'),
     # Customer Document Associations
     path('customer-document', CustomerDocAssocListView.as_view(), name='customer_doc_assoc_list'),
     path('customer-document/add', CustomerDocAssocCreateView.as_view(), name='customer_doc_assoc_create'),

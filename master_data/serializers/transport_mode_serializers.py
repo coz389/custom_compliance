@@ -11,9 +11,10 @@ class TransportModeBasicSerializer(serializers.ModelSerializer):
 
 
 class TransportModeSerializer(serializers.ModelSerializer):
+    created_by = serializers.SlugRelatedField(slug_field='username', read_only=True)
     class Meta:
         model = TransportMode
-        fields = ['id', 'code', 'name', 'status', 'created_at']
+        fields = ['id', 'code', 'name', 'status', 'created_at', 'created_by']
 
 
 class TransportModeListRequestSerializer(serializers.Serializer):
@@ -22,6 +23,7 @@ class TransportModeListRequestSerializer(serializers.Serializer):
     code = serializers.CharField(required=False, allow_blank=True)
     name = serializers.CharField(required=False, allow_blank=True)
     status = serializers.BooleanField(required=False, allow_null=True)
+    created_by = serializers.SlugRelatedField(slug_field='username', read_only=True)
     page = serializers.IntegerField(required=False, default=1)
     page_size = serializers.IntegerField(required=False, default=10)
     sort_column = serializers.CharField(required=False, default='created_at')

@@ -5,7 +5,6 @@ from master_data.models import CustomerLspAssoc
 
 class CustomerLspAssocSerializer(serializers.ModelSerializer):
     customer_name = serializers.CharField(source='customer.customer_name', read_only=True)
-    company_name = serializers.CharField(source='company.company_name', read_only=True)
     carrier_name = serializers.CharField(source='carrier.carrier_name', read_only=True)
     transport_name = serializers.CharField(source='transport.name', read_only=True, allow_null=True, default=None)
     created_by = serializers.SlugRelatedField(slug_field='username', read_only=True)
@@ -15,25 +14,13 @@ class CustomerLspAssocSerializer(serializers.ModelSerializer):
         model = CustomerLspAssoc
         fields = [
             'id', 'status', 'customer', 'customer_name',
-            'company', 'company_name', 'carrier', 'carrier_name',
+            'carrier', 'carrier_name',
             'transport', 'transport_name', 'created_by', 'created_at', 'updated_by', 'updated_at',
         ]
-
-    def validate(self, attrs):
-        customer = attrs.get('customer', getattr(self.instance, 'customer', None))
-        company = attrs.get('company', getattr(self.instance, 'company', None))
-
-        if customer and company and company.customer_id != customer.id:
-            raise serializers.ValidationError({
-                'company': 'Selected company does not belong to the selected customer.'
-            })
-
-        return attrs
 
 
 class CustomerLspAssocListSerializer(serializers.Serializer):
     customer = serializers.IntegerField(required=False)
-    company = serializers.IntegerField(required=False)
     carrier = serializers.IntegerField(required=False)
     transport = serializers.IntegerField(required=False)
     status = serializers.BooleanField(required=False, allow_null=True)
