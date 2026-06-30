@@ -10,7 +10,7 @@ from master_data.models import DocumentType
 from master_data.serializers import DocumentTypeSerializer, DocumentTypeListRequestSerializer
 
 
-from drf_spectacular.utils import extend_schema, extend_schema_view # Swagger customization
+from drf_spectacular.utils import extend_schema,extend_schema_view # Swagger customization
 
 User = get_user_model()
 
@@ -188,7 +188,7 @@ class DocumentTypeDetailView(generics.RetrieveUpdateDestroyAPIView):
         }, status=status.HTTP_200_OK)
 
 
-@extend_schema_view(get=extend_schema(
+@extend_schema_view( get=extend_schema(
     responses={200: DocumentTypeSerializer(many=False)},
     tags=["Dropdown lists"],
     description="Dropdown list of active document types.",
