@@ -6,7 +6,7 @@ from django.core.validators import RegexValidator
 import re
 from django.core.validators import validate_email
 from core.models import UserActivityLog
-
+from drf_spectacular.utils import OpenApiTypes, extend_schema_field
 
 User = get_user_model()
 
@@ -67,6 +67,7 @@ class UserSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)
         return rep
     
+    @extend_schema_field(OpenApiTypes.OBJECT)
     def get_customers(self, obj):
         grouped = {}
         for assoc in obj.user_customer_assoc.all():
