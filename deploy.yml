@@ -1,0 +1,111 @@
+name: Build and Deploy
+
+on:
+    push:
+        branches: ["main"]
+
+concurrency:
+    group: deploy-${{ github.repository }}
+    cancel-in-progress: false
+
+env:
+    REGISTRY: ghcr.io
+
+jobs:
+    build-and-push:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            packages: write
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+
+            - name: Lowercase Image Name
+              run: echo "IMAGE_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+            - name: Log in to GHCR
+              uses: docker/login-action@v3
+              with:
+                  registry: ${{ env.REGISTRY }}
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Build and Push
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  push: true
+                  tags: |
+                      ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+                      ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+                  cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+                  cache-to: type=inline
+
+    deploy:
+        name: Deploy to Deploy Server
+        needs: build-and-push
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        permissions:
+            packages: read
+
+        steps:
+            - name: Setup Deployment Vars
+              run: |
+                  echo "IMAGE_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+                  echo "CONTAINER_NAME=$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+            - name: Deploy via Jump Server
+              uses: appleboy/ssh-action@v1.0.3
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  USERNAME: ${{ github.actor }}
+                  APP_PORT: ${{ vars.APP_PORT }}
+                  CONTAINER_PORT: ${{ vars.CONTAINER_PORT }}
+                  IMAGE_NAME: ${{ env.IMAGE_NAME }}
+                  CONTAINER_NAME: ${{ env.CONTAINER_NAME }}
+                  REGISTRY: ${{ env.REGISTRY }}
+                  IMAGE_SHA: ${{ github.sha }}
+              with:
+                  host: ${{ secrets.DEPLOY_SERVER_IP }}
+                  username: ${{ vars.DEPLOY_SERVER_USER }}
+                  key: ${{ secrets.SSH_DEPLOY_PRIVATE_KEY }}
+                  proxy_host: ${{ vars.JUMP_SERVER_HOST }}
+                  proxy_port: 22
+                  proxy_username: github-jump
+                  proxy_key: ${{ secrets.SSH_JUMP_PRIVATE_KEY }}
+                  envs: GH_TOKEN,USERNAME,APP_PORT,CONTAINER_PORT,IMAGE_NAME,CONTAINER_NAME,REGISTRY,IMAGE_SHA
+                  script: |
+                      set -euo pipefail
+
+                      echo "$GH_TOKEN" | docker login "$REGISTRY" -u "$USERNAME" --password-stdin
+
+                      FULL_IMAGE="$REGISTRY/$IMAGE_NAME:$IMAGE_SHA"
+                      HOST_VOLUME="/external/coz-hub/$CONTAINER_NAME"
+                      HOST_ENV="$HOST_VOLUME/.env"
+
+                      mkdir -p "$HOST_VOLUME"
+                      chmod 777 "$HOST_VOLUME"
+
+                      [ -f "$HOST_ENV" ] || touch "$HOST_ENV"
+
+                      docker pull "$FULL_IMAGE"
+                      docker stop "$CONTAINER_NAME" 2>/dev/null || true
+                      docker rm "$CONTAINER_NAME" 2>/dev/null || true
+
+                      docker run -d \
+                        --name "$CONTAINER_NAME" \
+                        --restart unless-stopped \
+                        -p "$APP_PORT:$CONTAINER_PORT" \
+                        --cpus="2.0" \
+                        --memory="4g" \
+                        --log-opt max-size=10m \
+                        --log-opt max-file=3 \
+                        -v "$HOST_VOLUME:/usr/src/app/data" \
+                        -v "$HOST_ENV:/usr/src/app/.env" \
+                        "$FULL_IMAGE"
+
+                      docker logout "$REGISTRY"
+                      docker image prune -f

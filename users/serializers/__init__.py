@@ -1,17 +1,20 @@
-from .role_serializers import RoleSerializer,RoleListRequestSerializer
+from .role_serializers import RoleSerializer,RoleListRequestSerializer,RoleDetailsSerializer
 from .module_serializers import ModuleSerializer
-from .role_permission_serializers import RolePermissionSerializer
-from .user_serializers import UserSerializer, UserCreateSerializer, UserUpdateSerializer,UserListRequestSerializer
-from .auth_serializers import RegisterSerializer,ChangePasswordSerializer
+from .role_permission_serializers import RolePermissionSerializer,RolePermissionCreateUpdateSerializer,ModuleActionDropdownSerializer,RolePermissionListSerializer
+from .user_serializers import UserSerializer, UserCreateSerializer, UserUpdateSerializer,UserListRequestSerializer,UserDropdownSerializer,UserActivityLogListSerializer,UserActivityLogListRequestSerializer
+from .auth_serializers import RegisterSerializer,ChangePasswordSerializer,LoginSerializer,LogoutSerializer,LogoutAllSerializer
 __all__ = [
     'RoleSerializer',
-    'RoleListRequestSerializer',
+    'RoleListRequestSerializer','RoleDetailsSerializer',
     'ModuleSerializer',
-    'RolePermissionSerializer',
+    'RolePermissionSerializer','RolePermissionCreateUpdateSerializer','ModuleActionDropdownSerializer','RolePermissionListSerializer',
     'UserSerializer',
     'UserCreateSerializer',
     'UserUpdateSerializer',
-    'UserListRequestSerializer',
+    'UserListRequestSerializer','UserDropdownSerializer','UserActivityLogListSerializer','UserActivityLogListRequestSerializer',
     'RegisterSerializer',
     'ChangePasswordSerializer',
+    'LoginSerializer',
+    'LogoutSerializer',
+    'LogoutAllSerializer'
 ]

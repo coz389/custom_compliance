@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from users.models import User, Role, Module, RolePermission, user
+from users.models import User, Role, Module, RolePermission,Action,ModuleActionAssoc
 from rest_framework.validators import UniqueValidator
 
 
@@ -54,7 +54,7 @@ class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         # fields = '__all__'
-        fields = ['id', 'name', 'code', 'description', 'status', 'created_at','created_by', 'updated_by', 'deleted_by']
+        fields = ['id', 'name', 'code', 'description', 'status', 'created_at','created_by', 'updated_by', 'updated_at' ,'deleted_by']
         read_only_fields = ['created_by', 'updated_by', 'deleted_by']
 
     def get_created_by_name(self, obj):
@@ -66,14 +66,14 @@ class RoleSerializer(serializers.ModelSerializer):
         raw_name = validated_data.get('name')
         clean_spaces = " ".join(raw_name.split())
         generated_code = clean_spaces.replace(' ', '_').lower()
-        # CRITICAL VALIDATION DETECTOR: 20 characters length boundary checkpoint
-        if len(generated_code) > 20:
+        # CRITICAL VALIDATION DETECTOR: 80 characters length boundary checkpoint
+        if len(generated_code) > 80:
             raise serializers.ValidationError({
                 "success": False,
                 "message": "The generated configuration identifier is too long.",
                 "data": {
                     "name": [
-                        f"The name provided generates a code '{generated_code}' ({len(generated_code)} characters) which exceeds the system maximum length threshold of 20 characters."
+                        f"The name provided generates a code '{generated_code}' ({len(generated_code)} characters) which exceeds the system maximum length threshold of 80 characters."
                     ]
                 }
             })
@@ -97,3 +97,46 @@ class RoleListRequestSerializer(serializers.Serializer):
     page_size = serializers.IntegerField(required=False, default=10)
     sort_column = serializers.CharField(required=False, default='created_at')
     sort_order = serializers.ChoiceField(choices=['asc', 'desc'], required=False, default='asc')
+
+
+
+
+
+# Role wise Module and Action Details
+# A. Basic serializers for Module and Action
+class ModuleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Module
+        fields = ['id', 'name', 'code']
+
+class ActionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Action
+        fields = ['id', 'name', 'code']
+
+# B. Serializer for ModuleActionAssoc
+class ModuleActionAssocSerializer(serializers.ModelSerializer):
+    module_action_assoc_id = serializers.ReadOnlyField(source='id')
+    module = ModuleSerializer(read_only=True)
+    action = ActionSerializer(read_only=True)
+
+    class Meta:
+        model = ModuleActionAssoc
+        fields = ['module_action_assoc_id', 'module', 'action'] #'id',
+
+# C. Serializer for RolePermission
+class RolePermissionSerializer(serializers.ModelSerializer):
+    # module_action_assoc details ko nest karein
+    details = ModuleActionAssocSerializer(source='module_action_assoc', read_only=True)
+
+    class Meta:
+        model = RolePermission
+        fields = ['id', 'details']
+class RoleDetailsSerializer(serializers.ModelSerializer):
+    created_by = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    updated_by = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    permissions = RolePermissionSerializer(source='role_permissions', many=True, read_only=True)
+    class Meta:
+        model = Role
+        # fields = '__all__'
+        fields = ['id', 'name', 'code','description', 'status','created_by', 'created_at', 'updated_by','updated_at','permissions']

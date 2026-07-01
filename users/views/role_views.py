@@ -2,12 +2,13 @@ from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from users.models import Role,User
-from users.serializers import RoleSerializer,RoleListRequestSerializer
+from users.serializers import RoleSerializer,RoleListRequestSerializer,RoleDetailsSerializer
 # from users.serializers import RoleSerializer
 from core.permissions import HasModulePermission
 import django_filters
 from django.db.models import Q
 from django.contrib.auth import get_user_model
+
 
 from drf_spectacular.utils import extend_schema # Swagger customization
 
@@ -137,6 +138,7 @@ class RoleCreateView(generics.CreateAPIView):
         # Explicitly set action to 'add' for creation
         super().check_permissions(request)
 
+@extend_schema(tags=['Roles Management']) 
 class RoleDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     Retrieve, update or delete a specific role (admin only)
@@ -146,6 +148,11 @@ class RoleDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
     module_code = 'user_roles'
     action_code = 'view'  # default to view, will adjust in check_permissions
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return RoleDetailsSerializer
+        return RoleSerializer
 
     def get_action_code(self):
         if self.request.method == 'GET':
@@ -160,7 +167,7 @@ class RoleDetailView(generics.RetrieveUpdateDestroyAPIView):
         self.action_code = self.get_action_code()
         super().check_permissions(request)
 
-    def destroy(self, request, *args, **kwargs) -> Response:
+    def destroy(self, request, *args, **kwargs):
         # 1. Look up object inside default active manager scope
         instance = self.get_object()
         
@@ -179,7 +186,8 @@ class RoleDetailView(generics.RetrieveUpdateDestroyAPIView):
         
         return Response({
             "status": "success",
-            "message": "Role soft-deleted successfully",
+            "message": "Role deleted successfully",
             "data": serializer.data
         }, status=status.HTTP_200_OK)
+
 

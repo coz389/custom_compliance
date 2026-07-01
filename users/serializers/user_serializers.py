@@ -5,6 +5,7 @@ from users.models import User, Role, Module, RolePermission, Action
 from django.core.validators import RegexValidator
 import re
 from django.core.validators import validate_email
+from core.models import UserActivityLog
 
 
 User = get_user_model()
@@ -41,7 +42,7 @@ class RolePermissionSerializer(serializers.ModelSerializer):
         custom_module_data = {
             "id": instance.module.id,
             "module_name": instance.module.name,
-            "modu_code": instance.module.code,
+            "module_code": instance.module.code,
             "action_name": instance.action.name,
             "action_code": instance.action.code
         }
@@ -52,31 +53,29 @@ class RolePermissionSerializer(serializers.ModelSerializer):
             "module": custom_module_data
         }
 
-class RoleBasicSerializer(serializers.ModelSerializer):
-    permissions = RolePermissionSerializer(source='role_permissions', many=True, read_only=True)
-    class Meta:
-        model = Role
-        fields = ['id', 'name', 'code', 'permissions']
-        read_only_fields = fields
-
-
 class UserSerializer(serializers.ModelSerializer):
     role_name = serializers.CharField(source='role.name', read_only=True)
     role_code = serializers.CharField(source='role.code', read_only=True)
-
-
-    # Nested user data (read-only)
-    role = RoleBasicSerializer(read_only=True)
+    customers = serializers.SerializerMethodField()
     class Meta:
         model = User
         fields = ('id', 'email', 'username', 'first_name', 'last_name', 'profile_pic',
-                  'bio', 'role', 'role_name', 'role_code', 'is_active', 'created_at')
+                  'bio', 'role', 'role_name', 'role_code', 'is_active', 'created_at','customers')
         read_only_fields = ('id', 'created_at')
 
     def to_representation(self, instance):
-        # Remove role field id if not admin? Keep as is.
         rep = super().to_representation(instance)
         return rep
+    
+    def get_customers(self, obj):
+        grouped = {}
+        for assoc in obj.user_customer_assoc.all():
+            customer = assoc.customer
+            grouped.setdefault(customer.id, {
+                "customer_id": customer.id,
+                "customer_name": customer.customer_name,
+            })
+        return list(grouped.values())
 
 class UserCreateSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
@@ -182,7 +181,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone_number']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone_number','role']
     
     def validate_username(self, value):
         """Username validation for update (exclude current user)"""
@@ -209,9 +208,9 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-class UserListRequestSerializer(serializers.Serializer):
+class UserListRequestSerializer(serializers.ModelSerializer):
     """ Only for documentation and validation of list endpoint filters and pagination parameters in Swagger. Not used for actual filtering logic in the view."""
-    search = serializers.CharField(required=False, allow_blank=True, help_text="Name, code ya description mein search karein")
+    search = serializers.CharField(required=False, allow_blank=True, help_text="Name, code or description")
     name = serializers.CharField(required=False, allow_blank=True)
     email = serializers.EmailField(required=False, allow_null=True)
     phone_number = serializers.CharField(required=False, allow_null=True)
@@ -220,3 +219,60 @@ class UserListRequestSerializer(serializers.Serializer):
     page_size = serializers.IntegerField(required=False, default=10)
     sort_column = serializers.CharField(required=False, default='created_at')
     sort_order = serializers.ChoiceField(choices=['asc', 'desc'], required=False, default='asc')
+
+    class Meta:
+        model = User
+        fields = ("search", "name", "email","phone_number","created_at","page","page_size","sort_column","sort_order")
+
+class UserDropdownSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "username", "email")
+
+
+
+
+
+class UserActivityLogListRequestSerializer(serializers.ModelSerializer):
+    """ Only for documentation and validation of list endpoint filters and pagination parameters in Swagger. Not used for actual filtering logic in the view."""
+    search = serializers.CharField(required=False,allow_blank=True)
+    user_username = serializers.CharField(required=False)
+    user_email = serializers.CharField(required=False)
+    model_name = serializers.CharField(required=False)
+    action_name = serializers.CharField(required=False)
+    object_id = serializers.IntegerField(required=False)
+    timestamp = serializers.DateField(required=False)
+    timestamp_min = serializers.DateField(required=False)
+    timestamp_max = serializers.DateField(required=False)
+    page = serializers.IntegerField(required=False,default=1)
+    page_size = serializers.IntegerField(required=False,default=10)
+    sort_column = serializers.CharField(required=False,default="timestamp")
+    sort_order = serializers.ChoiceField(choices=["asc", "desc"],default="desc",required=False)
+    class Meta:
+        model = UserActivityLog
+        fields = (
+            "search",
+            "user_username",
+            "user_email",
+            "model_name",
+            "action_name",
+            "object_id",
+            "ip_address",
+            "timestamp",
+            "timestamp_min",
+            "timestamp_max",
+            "page",
+            "page_size",
+            "sort_column",
+            "sort_order",
+        )
+
+class UserActivityLogListSerializer(serializers.ModelSerializer):
+    user = UserDropdownSerializer(read_only=True)
+    user_username = serializers.CharField(source="user.username", read_only=True)
+    user_email = serializers.CharField(source="user.email", read_only=True)
+    class Meta:
+        model = UserActivityLog
+        fields = ('id','user', 'user_username', 'user_email','model_name','action_name','object_id','before_input','after_input','description','ip_address','user_agent','timestamp')
+        read_only_fields = ('id', 'timestamp')
+

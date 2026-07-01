@@ -1,15 +1,20 @@
 import django_filters
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status,serializers as drf_serializers
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from yaml import serializer
-from users.serializers import UserSerializer, UserCreateSerializer,UserListRequestSerializer
+from core.pagination import StandardResultsSetPagination
+from users.serializers import UserSerializer, UserCreateSerializer,UserListRequestSerializer,UserUpdateSerializer,UserDropdownSerializer,UserActivityLogListSerializer,UserActivityLogListRequestSerializer
 from core.permissions import HasModulePermission
 from rest_framework.views import APIView
 from django.db.models import Q
-from drf_spectacular.utils import extend_schema
-
+from datetime import datetime
+from drf_spectacular.utils import extend_schema,inline_serializer, OpenApiExample,extend_schema_view
+from django.db import transaction
+from users.models import UserCustomerAssoc
+from master_data.models import Customer
+from core.models import UserActivityLog
 User = get_user_model()
 
 class UserFilter(django_filters.FilterSet):
@@ -28,13 +33,13 @@ class UserFilter(django_filters.FilterSet):
 
 class UserListView(APIView):
     """
-    POST method ka upyog karke roles ki filtered list prapt karein.
+    POST method
     """
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
     module_code = 'user_management'
     action_code = 'view'  # default to view, will adjust in check_permissions
 
-    pagination_class = PageNumberPagination 
+    pagination_class = StandardResultsSetPagination 
     @extend_schema(
         request=UserListRequestSerializer,
         responses={200: UserSerializer(many=True)},
@@ -104,8 +109,115 @@ class UserListView(APIView):
 
         serializer = UserSerializer(queryset, many=True)
         return Response(serializer.data)
-@extend_schema(tags=['Users Management']) 
-class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
+
+class UserDetailView(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+    module_code = 'user_management'
+    action_code = 'view'
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return UserSerializer
+        return UserUpdateSerializer
+
+    def get_action_code(self):
+        if self.request.method == 'GET':
+            return 'view'
+        elif self.request.method in ['PUT', 'PATCH']:
+            return 'update'
+        return None
+
+    def check_permissions(self, request):
+        self.action_code = self.get_action_code()
+        super().check_permissions(request)
+
+    @extend_schema(
+        tags=['Users Management'],
+        summary='Retrieve a user',
+        description='Get full details of a specific user including assigned companies.',
+        responses={200: UserSerializer},
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    @extend_schema(
+        tags=['Users Management'],
+        summary='Update user with customer assignments',
+        description='Updates user fields and replaces all existing customer assignments.',
+        request=inline_serializer(
+            name='UserUpdateWithCompaniesRequest',
+            fields={
+                'first_name':   drf_serializers.CharField(required=False),
+                'last_name':    drf_serializers.CharField(required=False),
+                'email':        drf_serializers.EmailField(required=False),
+                'role':         drf_serializers.IntegerField(required=False),
+                'is_active':    drf_serializers.BooleanField(required=False),
+                'customer_ids':  drf_serializers.ListField(
+                    child=drf_serializers.IntegerField(min_value=1),
+                    required=False,
+                    help_text='List of Customer IDs. Replaces existing assignments.',
+                ),
+            }
+        ),
+        examples=[
+            OpenApiExample(
+                name='Update user and assign customers',
+                value={
+                    'first_name': 'Abhishek',
+                    'last_name':  'Sahu',
+                    'role':       1,
+                    'is_active':  True,
+                    'customer_ids': [1, 2, 3],
+                },
+                request_only=True,
+            )
+        ],
+        responses={200: UserSerializer},
+    )
+    def put(self, request, *args, **kwargs):
+        return super().put(request, *args, **kwargs)
+
+    @extend_schema(
+        tags=['Users Management'],
+        summary='Partially update user',
+        request=inline_serializer(
+            name='UserPartialUpdateRequest',
+            fields={
+                'first_name':  drf_serializers.CharField(required=False),
+                'last_name':   drf_serializers.CharField(required=False),
+                'email':       drf_serializers.EmailField(required=False),
+                'role':        drf_serializers.IntegerField(required=False),
+                'is_active':   drf_serializers.BooleanField(required=False),
+                'customer_ids': drf_serializers.ListField(
+                    child=drf_serializers.IntegerField(min_value=1),
+                    required=False,
+                    help_text='List of Customer IDs. Replaces existing assignments.',
+                ),
+            }
+        ),
+        responses={200: UserSerializer},
+    )
+    def patch(self, request, *args, **kwargs):
+        return super().patch(request, *args, **kwargs)
+
+    @transaction.atomic
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        customer_ids = self.request.data.get('customer_ids')
+
+        if not customer_ids:
+            return
+
+        instance.user_customer_assoc.all().delete()
+
+        UserCustomerAssoc.objects.bulk_create([
+            UserCustomerAssoc(user=instance, customer_id=int(cid), created_by=instance)
+            for cid in customer_ids
+        ])
+
+class UserDetailView123(generics.RetrieveUpdateAPIView):#RetrieveUpdateDestroyAPIView
     """
     Retrieve, update or delete a specific user (admin only)
     """
@@ -115,20 +227,47 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     module_code = 'user_management'
     action_code = 'view'  # default to view, will adjust in check_permissions
 
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return UserSerializer
+        return UserUpdateSerializer
+
     def get_action_code(self):
         if self.request.method == 'GET':
             return 'view'
         elif self.request.method in ['PUT', 'PATCH']:
             return 'update'
-        elif self.request.method == 'DELETE':
-            return 'delete'
         return None
 
     def check_permissions(self, request):
         self.action_code = self.get_action_code()
         super().check_permissions(request)
+        
 
-    def destroy(self, request, *args, **kwargs) -> Response:
+    @transaction.atomic
+    def perform_update(self, serializer):
+        # Get Primary table (User) Instance and Save to other table
+        instance = serializer.save()  
+        customer_ids = self.request.data.get('customer_ids')
+        if not customer_ids:
+            return
+        
+        # Delete all existing associations
+        UserCustomerAssoc.objects.filter(user=instance).delete()
+        
+        if not customer_ids:
+            return
+        
+        # Fresh insert
+        UserCustomerAssoc.objects.bulk_create([
+            UserCustomerAssoc(user=instance, customer_id=int(cid), created_by=instance)
+            for cid in customer_ids
+        ])
+
+        
+       
+    """
+    def destroy(self, request, *args, **kwargs):
         # 1. Look up object inside default active manager scope
         instance = self.get_object()
         
@@ -150,7 +289,7 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
             "message": "User soft-deleted successfully",
             "data": serializer.data
         }, status=status.HTTP_200_OK)
-    
+    """
 
 @extend_schema(tags=['Users Management']) 
 class UserActiveInactiveView(APIView):
@@ -158,6 +297,7 @@ class UserActiveInactiveView(APIView):
     Activate or deactivate a user (admin only)
     """
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+    serializer_class = None
     module_code = 'user_management'
     action_code = 'update'
 
@@ -173,3 +313,177 @@ class UserActiveInactiveView(APIView):
 
         status_str = "activated" if user.is_active else "deactivated"
         return Response({"detail": f"User has been {status_str}."}, status=status.HTTP_200_OK)
+    
+@extend_schema(tags=['Users Management']) 
+class UserListByRoleDropdownView(APIView):
+    """
+    Dropdown API: Get users by role_id
+    """
+    permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+    serializer_class = UserDropdownSerializer
+    module_code = 'user_management'
+    action_code = 'view'
+
+    def get(self, request, role_id):
+
+        users = User.objects.filter(
+            role_id=role_id,
+            is_active=True
+        ).only("id", "username", "email")
+
+        serializer = self.get_serializer(users, many=True)
+
+        return Response({
+            "status": "success",
+            "results": serializer.data
+        }, status=status.HTTP_200_OK)
+    
+
+
+
+class UserActivityLogFilter(django_filters.FilterSet):
+    user_username = django_filters.CharFilter(
+        field_name="user__username",
+        lookup_expr="icontains"
+    )
+    user_email = django_filters.CharFilter(
+        field_name="user__email",
+        lookup_expr="icontains"
+    )
+    model_name = django_filters.CharFilter(
+        lookup_expr="icontains"
+    )
+
+    action_name = django_filters.CharFilter(
+        lookup_expr="iexact"
+    )
+
+    object_id = django_filters.NumberFilter()
+
+    timestamp = django_filters.DateFilter(
+        field_name="timestamp",
+        lookup_expr="date"
+    )
+
+    timestamp_min = django_filters.DateFilter(
+        field_name="timestamp",
+        lookup_expr="date__gte"
+    )
+
+    timestamp_max = django_filters.DateFilter(
+        field_name="timestamp",
+        lookup_expr="date__lte"
+    )
+    
+    class Meta:
+        model = UserActivityLog
+        fields = ['user_username', 'user_email','model_name','action_name','object_id', 'timestamp', 'timestamp_min', 'timestamp_max']
+
+
+class UserActivityLogListView(APIView):
+    """
+    POST method
+    """
+    permission_classes = [HasModulePermission]
+    module_code = 'user_management'
+    action_code = 'view'  # default to view, will adjust in check_permissions
+
+    pagination_class = StandardResultsSetPagination 
+    @extend_schema(
+        request=UserActivityLogListRequestSerializer,
+        responses={200: UserActivityLogListSerializer(many=True)},
+        tags=['Users Management'], # Grouping in Swagger UI
+        description="List all User activity logs with optional filtering, sorting, and pagination. Use POST method to send filter criteria in the request body.", # Detailed description for Swagger UI
+        summary="List User Activity Logs (With Filter)",
+        operation_id="user_activity_logs_list_post"
+    )
+
+    def post(self, request):   
+        user = self.request.user
+        # print(f"Logged in Users : {user.__dict__}")   
+        # Clean request data: strip spaces from keys and values
+        clean_data = {k.strip(): (v.strip() if isinstance(v, str) else v) 
+                      for k, v in request.data.items()}
+        
+        # Sirf active records (Soft Delete handling) [History]
+        # queryset = UserActivityLog.objects.all()
+        queryset = UserActivityLog.objects.select_related(
+            "user"
+        )
+
+        # 1. Apply filters
+        filterset = UserActivityLogFilter(clean_data, queryset=queryset)
+        if filterset.is_valid():
+            queryset = filterset.qs
+        else:
+            return Response(filterset.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        # 2. Global Search
+        search = clean_data.get('search')
+        if search:
+            query = (
+                Q(user__username__icontains=search) |
+                Q(user__email__icontains=search) |
+                Q(model_name__icontains=search) |
+                Q(action_name__icontains=search) |
+                Q(description__icontains=search) |
+                Q(ip_address__icontains=search) |
+                Q(user_agent__icontains=search)
+            )
+            # Search by Object ID
+            if search.isdigit():
+                query |= Q(object_id=int(search))
+
+            # Search by Date
+            try:
+                search_date = datetime.strptime(
+                    search,
+                    "%Y-%m-%d"
+                ).date()
+
+                query |= Q(timestamp__date=search_date)
+
+            except ValueError:
+                pass
+
+            queryset = queryset.filter(query)
+
+
+        # 3. Ordering
+        sort_column = clean_data.get('sort_column', 'timestamp')
+        sort_order = clean_data.get('sort_order', 'desc') # default to newest first
+        
+        # Validate sort_column exists in model
+        allowed_columns = [
+            "timestamp",
+            "model_name",
+            "action_name",
+            "object_id",
+        ] #[f.name for f in UserActivityLog._meta.fields]
+        if sort_column in allowed_columns:
+            if sort_order.lower() == 'desc':
+                queryset = queryset.order_by(f'-{sort_column}')
+            else:
+                queryset = queryset.order_by(f'{sort_column}')
+
+        # 4. Pagination [1]
+        paginator = self.pagination_class()
+        page_num = clean_data.get('page', 1)
+        page_size = clean_data.get('page_size', paginator.page_size)
+        paginator.page_size = page_size
+        try:
+            request.query_params._mutable = True
+            request.query_params['page'] = page_num
+            request.query_params['page_size'] = page_size
+            request.query_params._mutable = False
+            page = paginator.paginate_queryset(queryset, request, view=self)
+            
+            if page is not None:
+                serializer = UserActivityLogListSerializer(page, many=True) 
+                return paginator.get_paginated_response(serializer.data)
+
+        except Exception as e:
+            return Response({"success": False, "detail": str(e)}, status=400)
+
+        serializer = UserActivityLogListSerializer(queryset, many=True)
+        return Response(serializer.data)
