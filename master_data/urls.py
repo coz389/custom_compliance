@@ -3,6 +3,7 @@ from master_data.views import (
     StatusListView,StatusDetailView,StatusCreateView,
     SubStatusListView,SubStatusDetailView, CarrierTypeListView,CarrierTypeCreateView,CarrierTypeDetailView,
     CountryDropdownView, StateDropdownView,CityCreateView, CityDetailView, CityListView,TransportModeDropdownView,
+    StatusDropdownView,
     ContainerCreateView, ContainerDetailView, ContainerListView,
     EquipmentCreateView, EquipmentDetailView, EquipmentListView,
     EquipmentDropdownView,
@@ -42,6 +43,7 @@ urlpatterns = [
     # Status
     path('status', StatusListView.as_view(), name='status_list_filter'),
     # path('status/add', StatusCreateView.as_view(), name='status_create'),
+    path('status/dropdown', StatusDropdownView.as_view(), name='status_dropdown'),
     path('status/<int:pk>', StatusDetailView.as_view(), name='status_detail'),
     # Sub Status
     path('sub-status', SubStatusListView.as_view(), name='sub_status_list_filter'),

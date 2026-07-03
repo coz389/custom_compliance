@@ -3,13 +3,14 @@ from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema
 from rest_framework import generics, permissions
 
 from core.permissions import HasModulePermission
-from master_data.models import Country, State, Equipment, Customer, TransportMode
+from master_data.models import Country, State, Equipment, Customer, TransportMode, Status
 from master_data.serializers import (
     CountryDropdownSerializer,
     CustomerDropdownSerializer,
     EquipmentDropdownSerializer,
     StateDropdownSerializer,
     TransportModeBasicSerializer,
+    StatusDropdownSerializer,
 )
 
 
@@ -178,5 +179,39 @@ class TransportModeDropdownView(generics.ListAPIView):
             queryset = queryset.filter(Q(code__icontains=search) | Q(name__icontains=search))
  
         return queryset.order_by("name")
+
+
+@extend_schema_view(get=extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="search",
+            description="Optional case-insensitive search by status name.",
+            required=False,
+            type=str,
+            location=OpenApiParameter.QUERY,
+        ),
+    ],
+    responses={200: StatusDropdownSerializer(many=True)},
+    tags=["Dropdown lists"],
+    description="Dropdown list of active statuses.",
+    summary="Status Dropdown",
+    operation_id="v1_status_list_dropdown",
+))
+class StatusDropdownView(generics.ListAPIView):
+    serializer_class = StatusDropdownSerializer
+    pagination_class = None
+    permission_classes = [permissions.IsAuthenticated, HasModulePermission]
+
+    module_code = "status"
+    action_code = "view"
+
+    def get_queryset(self):
+        queryset = Status.objects.filter(status=True)
+        search = self.request.query_params.get("search", "").strip()
+
+        if search:
+            queryset = queryset.filter(name__icontains=search)
+
+        return queryset.order_by("id")
 
 

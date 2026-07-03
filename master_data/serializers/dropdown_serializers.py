@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from drf_spectacular.utils import extend_schema_field
 
-from master_data.models import Country, State, Equipment, Customer, TransportMode, EmailTemplateHash
+from master_data.models import Country, State, Equipment, Customer, TransportMode, EmailTemplateHash, Status
 
 
 class CountryDropdownSerializer(serializers.ModelSerializer):
@@ -57,4 +57,10 @@ class EmailTemplateHashDropdownSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmailTemplateHash
         fields = ['id', 'hash_key', 'hash_title', 'lookup_key', 'template_type']
+        read_only_fields = fields
+        
+class StatusDropdownSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Status
+        fields = ["id", "name", "description"]
         read_only_fields = fields

@@ -4,7 +4,7 @@ from .carrier_type_view import CarrierTypeListView, CarrierTypeCreateView,Carrie
 from .city_views import CityCreateView, CityDetailView, CityListView
 from .container_views import ContainerCreateView, ContainerDetailView, ContainerListView
 from .equipment_views import EquipmentCreateView, EquipmentDetailView, EquipmentListView
-from .dropdown_views import CountryDropdownView, EquipmentDropdownView, StateDropdownView, CustomerDropdownView, TransportModeDropdownView
+from .dropdown_views import CountryDropdownView, EquipmentDropdownView, StateDropdownView, CustomerDropdownView, TransportModeDropdownView, StatusDropdownView
 from .seaport_views import SeaportCreateView, SeaportDetailView, SeaportListView
 from .customer_views import CustomerCreateView, CustomerDetailView, CustomerListView
 from .customer_doc_assoc_views import CustomerDocAssocCreateView, CustomerDocAssocDetailView, CustomerDocAssocListView
@@ -26,7 +26,7 @@ __all__=[
     'CarrierTypeListView','CarrierTypeCreateView','CarrierTypeDetailView',
     #Country City States Views
     'CityCreateView','CityDetailView','CityListView',
-    'CountryDropdownView','StateDropdownView','EquipmentDropdownView','CustomerDropdownView','TransportModeDropdownView',
+    'CountryDropdownView','StateDropdownView','EquipmentDropdownView','CustomerDropdownView','TransportModeDropdownView','StatusDropdownView',
     #Container Views
     'ContainerCreateView','ContainerDetailView','ContainerListView',
     #Equipment Views
