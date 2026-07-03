@@ -32,7 +32,7 @@ class DocumentTypeListView(generics.GenericAPIView):
     """
     List all document type with filtering using POST method
     """
-    queryset = DocumentType.objects.select_related('created_by', 'updated_by').filter(status=True)
+    queryset = DocumentType.objects.select_related('created_by', 'updated_by')
     serializer_class = DocumentTypeSerializer
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
     module_code = 'document_type'

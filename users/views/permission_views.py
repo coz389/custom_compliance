@@ -262,7 +262,7 @@ class BulkRolePermissionView(APIView):
             'module_action_assoc__module',
             'module_action_assoc__action'
         )
-        serializer =  self.get_serializer(created, many=True)
+        serializer =  self.serializer_class(created, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 @extend_schema_view(get=extend_schema(
