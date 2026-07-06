@@ -14,4 +14,4 @@ class UserCustomerAssoc(BaseModel):
         #unique_together = ('user', 'company')
 
     def __str__(self):
-        return f"{self.customer.customer_name} - {self.user.username}"
+        return f"{self.customer.name} - {self.user.username}"

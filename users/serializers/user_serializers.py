@@ -74,7 +74,7 @@ class UserSerializer(serializers.ModelSerializer):
             customer = assoc.customer
             grouped.setdefault(customer.id, {
                 "customer_id": customer.id,
-                "customer_name": customer.customer_name,
+                "customer_name": customer.name,
             })
         return list(grouped.values())
 
