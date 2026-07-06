@@ -16,6 +16,7 @@ from .carrier_contact_serializers import CarrierContactSerializer, CarrierContac
 from .inspection_area_serializers import InspectionAreaListSerializer,InspectionAreaListRequestSerializer,InspectionAreaCreateSerializer,InspectionAreaUpdateSerializer
 from .custom_officer_shift_serializers import CustomsOfficerShiftListSerializer,CustomsOfficerShiftListRequestSerializer,CustomsOfficerShiftCreateSerializer,CustomsOfficerShiftUpdateSerializer
 from .email_template_serializers import EmailTemplateListSerializer,EmailTemplateListRequestSerializer,EmailTemplateCreateSerializer,EmailTemplateUpdateSerializer
+from .customer_contact_serializers import CustomerContactSerializer, CustomerContactListSerializer
 
 __all__=[
     'StatusSerializer','StatusListRequestSerializer','StatusUpdateSerializer',
@@ -36,4 +37,5 @@ __all__=[
     'InspectionAreaListSerializer','InspectionAreaListRequestSerializer','InspectionAreaCreateSerializer','InspectionAreaUpdateSerializer',
     'CustomsOfficerShiftListSerializer','CustomsOfficerShiftListRequestSerializer','CustomsOfficerShiftCreateSerializer','CustomsOfficerShiftUpdateSerializer',
     'EmailTemplateListSerializer','EmailTemplateListRequestSerializer','EmailTemplateCreateSerializer','EmailTemplateUpdateSerializer',
+    'CustomerContactSerializer', 'CustomerContactListSerializer',
 ]

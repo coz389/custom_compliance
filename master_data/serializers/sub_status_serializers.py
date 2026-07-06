@@ -44,5 +44,5 @@ class SubStatusListRequestSerializer(serializers.Serializer):
     created_at = serializers.DateField(required=False, allow_null=True)
     page = serializers.IntegerField(required=False, default=1)
     page_size = serializers.IntegerField(required=False, default=10)
-    sort_column = serializers.CharField(required=False, default='created_at')
+    sort_column = serializers.CharField(required=False, default='id')
     sort_order = serializers.ChoiceField(choices=['asc', 'desc'], required=False, default='asc')

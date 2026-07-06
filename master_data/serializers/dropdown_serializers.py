@@ -41,6 +41,9 @@ class EquipmentDropdownSerializer(serializers.ModelSerializer):
 
 
 class CustomerDropdownSerializer(serializers.ModelSerializer):
+    customer_name = serializers.CharField(source='name', read_only=True)
+    customer_code = serializers.CharField(source='code', read_only=True)
+
     class Meta:
         model = Customer
         fields = ["id", "customer_name", "customer_code"]

@@ -16,6 +16,7 @@ from .carrier_contact_views import CarrierContactCreateView, CarrierContactDetai
 from .inspection_area_views import InspectionAreaListView,InspectionAreaCreateView,InspectionAreaDetailView
 from .custom_officer_shift_views import CustomsOfficerShiftListView,CustomsOfficerShiftCreateView,CustomsOfficerShiftDetailView
 from .email_template_views import EmailTemplateListView,EmailTemplateCreateView,EmailTemplateDetailView,EmailTemplateHashDropdownView
+from .customer_contact_views import CustomerContactCreateView, CustomerContactDetailView, CustomerContactListView
 
 __all__=[
     #Status Views
@@ -53,4 +54,6 @@ __all__=[
     'CustomsOfficerShiftListView','CustomsOfficerShiftCreateView','CustomsOfficerShiftDetailView',
     #Email Template Views
     'EmailTemplateListView','EmailTemplateCreateView','EmailTemplateDetailView','EmailTemplateHashDropdownView',
+    #Customer Contact Views
+    'CustomerContactCreateView','CustomerContactDetailView','CustomerContactListView',
 ]

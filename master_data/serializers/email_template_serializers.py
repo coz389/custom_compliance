@@ -7,7 +7,7 @@ class EmailTemplateListSerializer(serializers.ModelSerializer):
     created_by = serializers.SlugRelatedField(slug_field='username', read_only=True)
     updated_by = serializers.SlugRelatedField(slug_field='username', read_only=True)
     message_body = serializers.CharField(source='message')
-    customer_name = serializers.CharField(source='customer.customer_name', read_only=True)
+    customer_name = serializers.CharField(source='customer.name', read_only=True)
     status_name = serializers.CharField(source='status_ref.name', read_only=True)
     template_type_name = serializers.CharField(source='template_type.title', read_only=True)
 

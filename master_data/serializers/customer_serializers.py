@@ -3,12 +3,15 @@ from master_data.models import Customer
 
 
 class CustomerSerializer(serializers.ModelSerializer):
+    customer_name = serializers.CharField(source='name', required=False, allow_blank=False)
+    customer_code = serializers.CharField(source='code', required=False, allow_blank=False)
+
     def validate_customer_name(self, value):
         if not value or not value.strip():
             raise serializers.ValidationError("Customer name cannot be empty.")
 
         instance = self.instance
-        query = Customer.all_objects.filter(customer_name__iexact=value)
+        query = Customer.all_objects.filter(name__iexact=value)
 
         if instance:
             query = query.exclude(pk=instance.pk)
@@ -32,7 +35,7 @@ class CustomerSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Customer code cannot be empty.")
 
         instance = self.instance
-        query = Customer.all_objects.filter(customer_code__iexact=value)
+        query = Customer.all_objects.filter(code__iexact=value)
 
         if instance:
             query = query.exclude(pk=instance.pk)

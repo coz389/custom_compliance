@@ -17,7 +17,8 @@ from master_data.views import (
     CarrierContactCreateView, CarrierContactDetailView, CarrierContactListView,
     InspectionAreaListView,InspectionAreaCreateView,InspectionAreaDetailView,
     CustomsOfficerShiftListView,CustomsOfficerShiftCreateView,CustomsOfficerShiftDetailView,
-    EmailTemplateListView,EmailTemplateCreateView,EmailTemplateDetailView,EmailTemplateHashDropdownView
+    EmailTemplateListView,EmailTemplateCreateView,EmailTemplateDetailView,EmailTemplateHashDropdownView,
+    CustomerContactListView, CustomerContactCreateView, CustomerContactDetailView
 )
 
 urlpatterns = [
@@ -57,6 +58,11 @@ urlpatterns = [
     path('customers/add', CustomerCreateView.as_view(), name='customer_create'),
     path('customers/<int:pk>', CustomerDetailView.as_view(), name='customer_detail'),
     path('customers/dropdown', CustomerDropdownView.as_view(), name='customer_dropdown'),
+    #customer contacts
+    path('customer-contacts', CustomerContactListView.as_view(), name='customer_contact_list'),
+    path('customer-contacts/add', CustomerContactCreateView.as_view(), name='customer_contact_create'),
+    path('customer-contacts/<int:pk>', CustomerContactDetailView.as_view(), name='customer_contact_detail'),
+
     # Customer Document Associations
     path('customer-document', CustomerDocAssocListView.as_view(), name='customer_doc_assoc_list'),
     path('customer-document/add', CustomerDocAssocCreateView.as_view(), name='customer_doc_assoc_create'),

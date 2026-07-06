@@ -150,9 +150,9 @@ class CustomerDropdownView(generics.ListAPIView):
         customer_name = self.request.query_params.get("customer_name", "").strip()
 
         if customer_name:
-            queryset = queryset.filter(customer_name__icontains=customer_name)
+            queryset = queryset.filter(name__icontains=customer_name)
 
-        return queryset.order_by("customer_name")
+        return queryset.order_by("name")
 
 
 @extend_schema_view(get=extend_schema(

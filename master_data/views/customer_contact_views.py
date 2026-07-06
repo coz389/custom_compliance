@@ -4,34 +4,32 @@ from core.permissions import HasModulePermission
 import django_filters
 from django.db.models import Q
 
-from master_data.models import CustomerDocAssoc
-from master_data.serializers import (CustomerDocAssocSerializer,CustomerDocAssocListSerializer,)
+from master_data.models import CustomerContact
+from master_data.serializers import (CustomerContactSerializer, CustomerContactListSerializer,)
 
 from drf_spectacular.utils import extend_schema
 
 
-class CustomerDocAssocFilter(django_filters.FilterSet):
+class CustomerContactFilter(django_filters.FilterSet):
     customer = django_filters.NumberFilter(field_name='customer_id')
-    document_type = django_filters.NumberFilter(field_name='document_type_id')
-    export_country = django_filters.NumberFilter(field_name='export_country_id')
-    import_country = django_filters.NumberFilter(field_name='import_country_id')
+    country = django_filters.NumberFilter(field_name='country_id')
+    port = django_filters.NumberFilter(field_name='port_id')
 
     class Meta:
-        model = CustomerDocAssoc
-        fields = ['customer', 'document_type', 'export_country', 'import_country']
+        model = CustomerContact
+        fields = ['customer', 'country', 'port']
 
 
-class CustomerDocAssocListView(generics.GenericAPIView):
+class CustomerContactListView(generics.GenericAPIView):
     """
-    List all customer-document type associations with filtering using POST method
+    List all customer contacts with filtering using POST method
     """
-    queryset = CustomerDocAssoc.objects.select_related(
-        'customer', 'document_type', 'export_country', 'import_country',
-        'created_by', 'updated_by'
+    queryset = CustomerContact.objects.select_related(
+        'customer', 'country', 'port', 'created_by', 'updated_by'
     ).all()
-    serializer_class = CustomerDocAssocSerializer
+    serializer_class = CustomerContactSerializer
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
-    module_code = 'customer_doc_assoc'
+    module_code = 'customer_contacts'
 
     def get_action_code(self):
         return 'view'
@@ -41,12 +39,12 @@ class CustomerDocAssocListView(generics.GenericAPIView):
         super().check_permissions(request)
 
     @extend_schema(
-        request=CustomerDocAssocListSerializer,
-        responses={200: CustomerDocAssocSerializer(many=True)},
-        tags=['Customer Document Associations'],
-        description="List all customer-document type associations with optional filtering, sorting, and pagination.",
-        summary="List Customer Document Types (with filtering)",
-        operation_id="v1_customer_document_type_list_post"
+        request=CustomerContactListSerializer,
+        responses={200: CustomerContactSerializer(many=True)},
+        tags=['Customer Contacts'],
+        description="List all customer contacts with optional filtering, sorting, and pagination.",
+        summary="List Customer Contacts (with filtering)",
+        operation_id="v1_customer_contacts_list_post"
     )
     def post(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -55,7 +53,7 @@ class CustomerDocAssocListView(generics.GenericAPIView):
                       for k, v in request.data.items()}
 
         # 1. Apply filters
-        filterset = CustomerDocAssocFilter(clean_data, queryset=queryset)
+        filterset = CustomerContactFilter(clean_data, queryset=queryset)
         if filterset.is_valid():
             queryset = filterset.qs
         else:
@@ -65,18 +63,19 @@ class CustomerDocAssocListView(generics.GenericAPIView):
         search = clean_data.get('search')
         if search:
             queryset = queryset.filter(
-                Q(customer__name__icontains=search) |
-                Q(customer__code__icontains=search) |
-                Q(document_type__name__icontains=search) |
-                Q(export_country__country_name__icontains=search) |
-                Q(import_country__country_name__icontains=search)
+                Q(name__icontains=search) |
+                Q(email__icontains=search) |
+                Q(phone_number__icontains=search) |
+                Q(transport_mode__icontains=search) |
+                Q(service_type__icontains=search) |
+                Q(customer__name__icontains=search)
             )
 
         # 3. Apply ordering
         sort_column = clean_data.get('sort_column', 'created_at')
         sort_order = clean_data.get('sort_order', 'desc')
 
-        allowed_columns = [f.name for f in CustomerDocAssoc._meta.fields]
+        allowed_columns = [f.name for f in CustomerContact._meta.fields]
         if sort_column in allowed_columns:
             prefix = '-' if sort_order.lower() == 'desc' else ''
             queryset = queryset.order_by(f'{prefix}{sort_column}')
@@ -104,30 +103,30 @@ class CustomerDocAssocListView(generics.GenericAPIView):
         return Response(serializer.data)
 
 
-@extend_schema(tags=['Customer Document Associations'])
-class CustomerDocAssocCreateView(generics.CreateAPIView):
+@extend_schema(tags=['Customer Contacts'])
+class CustomerContactCreateView(generics.CreateAPIView):
     """
-    Create a new customer-document type association
+    Create a new customer contact
     """
-    queryset = CustomerDocAssoc.objects.all()
-    serializer_class = CustomerDocAssocSerializer
+    queryset = CustomerContact.objects.all()
+    serializer_class = CustomerContactSerializer
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
-    module_code = 'customer_doc_assoc'
+    module_code = 'customer_contacts'
     action_code = 'add'
 
     def check_permissions(self, request):
         super().check_permissions(request)
 
 
-@extend_schema(tags=['Customer Document Associations'])
-class CustomerDocAssocDetailView(generics.RetrieveUpdateDestroyAPIView):
+@extend_schema(tags=['Customer Contacts'])
+class CustomerContactDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
-    Retrieve, update or delete a specific customer-document type association
+    Retrieve, update or delete a specific customer contact
     """
-    queryset = CustomerDocAssoc.objects.all()
-    serializer_class = CustomerDocAssocSerializer
+    queryset = CustomerContact.objects.all()
+    serializer_class = CustomerContactSerializer
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
-    module_code = 'customer_doc_assoc'
+    module_code = 'customer_contacts'
     action_code = 'view'
 
     def get_action_code(self):
@@ -147,10 +146,10 @@ class CustomerDocAssocDetailView(generics.RetrieveUpdateDestroyAPIView):
         instance = self.get_object()
         acting_user = request.user if request.user.is_authenticated else None
         instance.soft_delete(user=acting_user)
-        instance = CustomerDocAssoc.all_objects.get(pk=instance.pk)
+        instance = CustomerContact.all_objects.get(pk=instance.pk)
         serializer = self.get_serializer(instance)
         return Response({
             "status": "success",
-            "message": "Customer document association deleted successfully",
+            "message": "Customer contact deleted successfully",
             "data": serializer.data
         }, status=status.HTTP_200_OK)

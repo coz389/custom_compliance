@@ -64,7 +64,7 @@ class CustomerLspAssocListView(generics.GenericAPIView):
         search = clean_data.get('search')
         if search:
             queryset = queryset.filter(
-                Q(customer__customer_name__icontains=search) |
+                Q(customer__name__icontains=search) |
                 Q(carrier__carrier_name__icontains=search) |
                 Q(transport__name__icontains=search)
             )

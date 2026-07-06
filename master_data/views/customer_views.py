@@ -14,8 +14,8 @@ User = get_user_model()
 
 
 class CustomerFilter(django_filters.FilterSet):
-    customer_name = django_filters.CharFilter(lookup_expr='icontains')
-    customer_code = django_filters.CharFilter(lookup_expr='icontains')
+    customer_name = django_filters.CharFilter(field_name='name', lookup_expr='icontains')
+    customer_code = django_filters.CharFilter(field_name='code', lookup_expr='icontains')
     created_at = django_filters.DateFilter(field_name='created_at', lookup_expr='date')
     created_at_min = django_filters.DateFilter(field_name='created_at', lookup_expr='date__gte')
     created_at_max = django_filters.DateFilter(field_name='created_at', lookup_expr='date__lte')
@@ -77,8 +77,8 @@ class CustomerListView(generics.GenericAPIView):
         search = clean_data.get('search')
         if search:
             queryset = queryset.filter(
-                Q(customer_name__icontains=search) |
-                Q(customer_code__icontains=search)
+                Q(name__icontains=search) |
+                Q(code__icontains=search)
             )
 
         # 3. Custom Pagination

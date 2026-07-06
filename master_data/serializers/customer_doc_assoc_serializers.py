@@ -7,7 +7,7 @@ from master_data.serializers.dropdown_serializers import CountryDropdownSerializ
 
 
 class CustomerDocAssocSerializer(serializers.ModelSerializer):
-    customer_name = serializers.CharField(source='customer.customer_name', read_only=True)
+    customer_name = serializers.CharField(source='customer.name', read_only=True)
     document_type_name = serializers.CharField(source='document_type.name', read_only=True)
     export_country_name = serializers.CharField(source='export_country.country_name', read_only=True)
     import_country_name = serializers.CharField(source='import_country.country_name', read_only=True)

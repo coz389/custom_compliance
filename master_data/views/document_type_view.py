@@ -36,7 +36,6 @@ class DocumentTypeListView(generics.GenericAPIView):
     serializer_class = DocumentTypeSerializer
     permission_classes = [permissions.IsAuthenticated, HasModulePermission]
     module_code = 'document_type'
-    print("Document Type List API calling...")
     def get_action_code(self):
         return 'view'
 
@@ -55,7 +54,6 @@ class DocumentTypeListView(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        print("Document Type List API calling...")
         # Clean request data: strip spaces from keys and values
         clean_data = {k.strip(): (v.strip() if isinstance(v, str) else v) 
                       for k, v in request.data.items()}

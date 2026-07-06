@@ -75,7 +75,7 @@ class CarrierContactListView(generics.GenericAPIView):
         if search:
             queryset = queryset.filter(
                 Q(carrier__carrier_name__icontains=search) |
-                Q(customer__customer_name__icontains=search) |
+                Q(customer__name__icontains=search) |
                 Q(type__icontains=search) |
                 Q(shipment_type__icontains=search) |
                 Q(service_type__icontains=search) |
